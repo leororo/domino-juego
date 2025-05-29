@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominó Cubano Doble 9</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="main-menu">
+        <h1>Dominó Cubano Doble 9</h1>
+        <div class="menu-options">
+            <button id="practice-button" class="menu-button">Practicar (vs IA)</button>
+            <button id="online-button" class="menu-button" disabled>Online (Próximamente)</button>
+            <button id="friends-button" class="menu-button" disabled>Con Amigos (Próximamente)</button>
+        </div>
+    </div>
+    <div id="app-container" class="hidden"> <!-- Inicia oculto -->
+        <header>
+            <h1>Dominó Cubano Doble 9</h1>
+            <nav id="game-options">
+                <button id="start-round-button">Iniciar Nueva Ronda</button>
+                <button id="contraste-button">Modo Contraste</button>
+                <button id="toggle-vista-fichas-button">Ver Puntos</button>
+                <button id="new-game-button">Nueva Partida</button>
+                <button id="back-to-menu-button">Menú Principal</button>
+            </nav>
+        </header>
+
+        <div id="game-area">
+            <aside id="scoreboard">
+                <h2>Puntuación</h2>
+                <!-- Contenido del marcador se actualiza por JS -->
+            </aside>
+
+            <main id="game-board">
+                <section id="player-hand-top" class="player-hand horizontal-hand">
+                    <!-- Mano del jugador de arriba -->
+                </section>
+                <div id="middle-area">
+                    <section id="player-hand-left" class="player-hand vertical-hand">
+                        <!-- Mano del jugador de la izquierda -->
+                    </section>
+                    <div id="domino-table">
+                        <!-- Fichas jugadas en la mesa -->
+                    </div>
+                    <section id="player-hand-right" class="player-hand vertical-hand">
+                        <!-- Mano del jugador de la derecha -->
+                    </section>
+                </div>
+                <section id="player-hand-bottom" class="player-hand horizontal-hand">
+                    <!-- Mano del jugador principal (abajo) -->
+                </section>
+            </main>
+        </div>
+
+        <footer>
+            <div id="game-messages">
+                <!-- Mensajes y notificaciones del juego -->
+            </div>
+            <p>&copy; 2025 Juego de Dominó</p> <!-- AÑO ACTUALIZADO -->
+        </footer>
+    </div>
+
+    <div id="zoom-popup" style="display: none;">
+        <div id="zoom-contenido">
+            <!-- La ficha ampliada se insertará aquí -->
+        </div>
+        <button id="zoom-cerrar-button">&times;</button>
+    </div>
+
+    <script src="script.js"></script> 
+</body>
+</html>
