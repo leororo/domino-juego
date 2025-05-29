@@ -15,13 +15,22 @@
             <button id="friends-button" class="menu-button" disabled>Con Amigos (Próximamente)</button>
         </div>
     </div>
-    <div id="app-container" class="hidden"> <!-- Inicia oculto -->
+    <div id="sub-menu-practica" class="hidden"> <!-- Inicia oculto -->
+        <h2>Modo Práctica</h2>
+        <div class="menu-options">
+            <button id="practice-1v1-button" class="menu-button">Individual (1 vs IA)</button>
+            <button id="practice-2v2-button" class="menu-button">Parejas (Tú + IA vs IA + IA)</button>
+            <button id="back-to-main-menu-from-submenu-button" class="menu-button secondary-button">Volver al Menú</button>
+        </div>
+    </div>
+    <div id="app-container">
         <header>
             <h1>Dominó Cubano Doble 9</h1>
             <nav id="game-options">
                 <button id="start-round-button">Iniciar Nueva Ronda</button>
                 <button id="contraste-button">Modo Contraste</button>
                 <button id="toggle-vista-fichas-button">Ver Puntos</button>
+                <button id="toggle-ayuda-fichas-button">Desactivar Ayuda Fichas</button>
                 <button id="new-game-button">Nueva Partida</button>
                 <button id="back-to-menu-button">Menú Principal</button>
             </nav>
@@ -30,10 +39,11 @@
         <div id="game-area">
             <aside id="scoreboard">
                 <h2>Puntuación</h2>
-                <!-- Contenido del marcador se actualiza por JS -->
+                <!-- Contenido del marcador -->
             </aside>
 
             <main id="game-board">
+                <!-- Representación visual del tablero de dominó -->
                 <section id="player-hand-top" class="player-hand horizontal-hand">
                     <!-- Mano del jugador de arriba -->
                 </section>
@@ -58,7 +68,7 @@
             <div id="game-messages">
                 <!-- Mensajes y notificaciones del juego -->
             </div>
-            <p>&copy; 2025 Juego de Dominó</p> <!-- AÑO ACTUALIZADO -->
+            <p>&copy; 2025 Juego de Dominó</p>
         </footer>
     </div>
 
@@ -69,6 +79,6 @@
         <button id="zoom-cerrar-button">&times;</button>
     </div>
 
-    <script src="script.js"></script> 
+    <script src="script.js"></script>
 </body>
 </html>
