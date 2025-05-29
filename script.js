@@ -1,5 +1,5 @@
 // Lógica del Juego de Dominó Cubano Doble 9
-// Autor: Tu Nombre/Alias (o dejar en blanco)
+// Autor: [Tu Nombre/Alias si lo deseas]
 // Fecha: 2024 (o fecha actual)
 
 // --- Variables Globales para el Estado del Juego ---
@@ -13,12 +13,12 @@ let estadoJuego = {
     numeroDeJugadores: 2,   // Se establecerá a 2 o 4
     consecutivePasses: 0,
     puntuacionParejas: [0, 0],    // Pareja 0 (Humano + Compañero), Pareja 1 (Oponentes)
-    vistaFichas: 'numeros', // Valores posibles: 'numeros', 'puntos'
+    vistaFichas: 'puntos', // Valores posibles: 'numeros', 'puntos' - PUNTOS ES EL NUEVO VALOR POR DEFECTO
     ayudaFichasJugablesActiva: true, 
     nombreJugador1: "Jugador 1", 
-    nombreCompanero: "Compañero (IA)", 
-    nombreOponenteDerecha: "Op. Derecha (IA)", 
-    nombreOponenteIzquierda: "Op. Izquierda (IA)", 
+    nombreCompanero: "Máquina 1",         // Usado para IA pareja (índice 2) en 4J y para IA oponente (índice 1) en 2J.
+    nombreOponenteDerecha: "Máquina 2",   // Usado para IA oponente derecha (índice 1) en 4J.
+    nombreOponenteIzquierda: "Máquina 3", // Usado para IA oponente izquierda (índice 3) en 4J.
     ultimaFichaJugadaId: null, // ID de la última ficha jugada para el scroll
 };
 
@@ -119,9 +119,15 @@ function verificarFinDePartida() {
         estadoJuego.juegoIniciado = false; 
         let mensajeFinal = "";
         const nombreJ1 = estadoJuego.nombreJugador1;
-        const nombrePareja0 = (estadoJuego.numeroDeJugadores === 4) ? `${nombreJ1} y ${estadoJuego.nombreCompanero}` : nombreJ1;
-        const nombrePareja1 = (estadoJuego.numeroDeJugadores === 4) ? `${estadoJuego.nombreOponenteDerecha} y ${estadoJuego.nombreOponenteIzquierda}` : "Oponente (IA)";
+        let nombrePareja0, nombrePareja1;
 
+        if (estadoJuego.numeroDeJugadores === 4) {
+            nombrePareja0 = `${nombreJ1} y ${estadoJuego.nombreCompanero}`; // Humano y Máquina 1
+            nombrePareja1 = `${estadoJuego.nombreOponenteDerecha} y ${estadoJuego.nombreOponenteIzquierda}`; // Máquina 2 y Máquina 3
+        } else { // 2 Jugadores
+            nombrePareja0 = nombreJ1;
+            nombrePareja1 = estadoJuego.nombreCompanero; // En 2J, el oponente (índice 1) es "Máquina 1"
+        }
 
         if (puntuacionPareja0 >= 100 && puntuacionPareja0 > puntuacionPareja1) {
             mensajeFinal = `¡${nombrePareja0} ha ganado la partida con ${puntuacionPareja0} puntos!`;
@@ -175,10 +181,13 @@ function iniciarNuevaRonda(esNuevaPartida = false) {
     actualizarUIMarcador(); 
     
     let nombreTurno;
-    if (estadoJuego.turnoJugador === 0) nombreTurno = estadoJuego.nombreJugador1;
-    else if (estadoJuego.turnoJugador === 1) nombreTurno = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : "Jugador 2 (IA)";
-    else if (estadoJuego.turnoJugador === 2) nombreTurno = estadoJuego.nombreCompanero;
-    else if (estadoJuego.turnoJugador === 3) nombreTurno = estadoJuego.nombreOponenteIzquierda;
+    switch (estadoJuego.turnoJugador) {
+        case 0: nombreTurno = estadoJuego.nombreJugador1; break;
+        case 1: nombreTurno = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : estadoJuego.nombreCompanero; break; 
+        case 2: nombreTurno = estadoJuego.nombreCompanero; break;     
+        case 3: nombreTurno = estadoJuego.nombreOponenteIzquierda; break; 
+        default: nombreTurno = "Jugador Desconocido";
+    }
     
     let mensajeRonda = `Inicia la ronda. Turno de ${nombreTurno}.`;
     if (estadoJuego.turnoJugador === 0 && dataSalida.fichaDeSalida) { 
@@ -186,6 +195,7 @@ function iniciarNuevaRonda(esNuevaPartida = false) {
     }
     actualizarMensaje(mensajeRonda);
     actualizarResaltadoFichasJugables(); 
+    actualizarResaltadoTurnoVisual(); // Resaltar turno del primer jugador
 
     document.getElementById('start-round-button').style.display = 'inline-block';
     document.getElementById('new-game-button').style.display = 'none';
@@ -303,12 +313,18 @@ function jugarFicha(fichaOriginal, extremoDelTableroAlQueConecta) {
         let parejaGanadoraIdx = -1;
 
         if (estadoJuego.numeroDeJugadores === 2) {
-            const oponenteIdx = (estadoJuego.turnoJugador + 1) % 2;
+            const oponenteIdx = 1; // En 2J, el oponente siempre es el índice 1
             puntosGanados = calcularPuntosMano(estadoJuego.manosJugadores[oponenteIdx]);
-            estadoJuego.puntuacionParejas[estadoJuego.turnoJugador] += puntosGanados;
-            nombreGanadorRonda = (estadoJuego.turnoJugador === 0) ? estadoJuego.nombreJugador1 : "Jugador 2 (IA)";
+            // El jugador actual (humano o IA) gana los puntos del oponente
+            if (estadoJuego.turnoJugador === 0) { // Humano ganó
+                estadoJuego.puntuacionParejas[0] += puntosGanados;
+                nombreGanadorRonda = estadoJuego.nombreJugador1;
+            } else { // IA (oponente - Máquina 1) ganó
+                estadoJuego.puntuacionParejas[1] += puntosGanados;
+                nombreGanadorRonda = estadoJuego.nombreCompanero; // Usamos nombreCompanero ("Máquina 1") para el oponente en 2J
+            }
             revelarManoJugadorIA(oponenteIdx, false);
-        } else { 
+        } else { // 4 Jugadores
             parejaGanadoraIdx = (estadoJuego.turnoJugador === 0 || estadoJuego.turnoJugador === 2) ? 0 : 1;
             nombreGanadorRonda = (parejaGanadoraIdx === 0) ? `${estadoJuego.nombreJugador1} y ${estadoJuego.nombreCompanero}` : `${estadoJuego.nombreOponenteDerecha} y ${estadoJuego.nombreOponenteIzquierda}`;
             
@@ -345,19 +361,23 @@ function cambiarTurno() {
     if (gameMessagesDiv) gameMessagesDiv.classList.remove('mensaje-pase-resaltado'); 
 
     estadoJuego.turnoJugador = (estadoJuego.turnoJugador + 1) % estadoJuego.numeroDeJugadores;
-    let nombreTurno;
-    if (estadoJuego.turnoJugador === 0) nombreTurno = estadoJuego.nombreJugador1;
-    else if (estadoJuego.turnoJugador === 1) nombreTurno = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : "Jugador 2 (IA)";
-    else if (estadoJuego.turnoJugador === 2) nombreTurno = estadoJuego.nombreCompanero;
-    else if (estadoJuego.turnoJugador === 3) nombreTurno = estadoJuego.nombreOponenteIzquierda;
+    let nombreTurnoActual;
+    switch (estadoJuego.turnoJugador) {
+        case 0: nombreTurnoActual = estadoJuego.nombreJugador1; break;
+        case 1: nombreTurnoActual = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : estadoJuego.nombreCompanero; break; 
+        case 2: nombreTurnoActual = estadoJuego.nombreCompanero; break;
+        case 3: nombreTurnoActual = estadoJuego.nombreOponenteIzquierda; break;
+        default: nombreTurnoActual = "Jugador Desconocido";
+    }
 
-    actualizarMensaje(`Turno de ${nombreTurno}.`);
+    actualizarMensaje(`Turno de ${nombreTurnoActual}.`);
     actualizarResaltadoFichasJugables(); 
+    actualizarResaltadoTurnoVisual(); // Resaltar turno del nuevo jugador
 
     if (estadoJuego.juegoIniciado) {
         if (!puedeJugar(estadoJuego.manosJugadores[estadoJuego.turnoJugador], estadoJuego.extremosAbiertos)) {
             estadoJuego.consecutivePasses++;
-            actualizarMensaje(`${nombreTurno} no tiene jugada. Pasa automáticamente. (Pases: ${estadoJuego.consecutivePasses})`);
+            actualizarMensaje(`${nombreTurnoActual} no tiene jugada. Pasa automáticamente. (Pases: ${estadoJuego.consecutivePasses})`);
             if (gameMessagesDiv) gameMessagesDiv.classList.add('mensaje-pase-resaltado'); 
             
             if (estadoJuego.consecutivePasses >= estadoJuego.numeroDeJugadores) { 
@@ -365,7 +385,8 @@ function cambiarTurno() {
                 
                 let mensajeTranque = "¡Juego Trancado! ";
                 let jugadorConMenosPuntos; 
-                let parejaGanadoraIdxTranque = -1; 
+                let parejaGanadoraIdxTranque = -1;
+                const oponente2JNombre = estadoJuego.nombreCompanero; // Para 2J, el oponente (índice 1) es "Máquina 1"
 
                 if (estadoJuego.numeroDeJugadores === 2) {
                     const puntosJ0 = calcularPuntosMano(estadoJuego.manosJugadores[0]);
@@ -373,12 +394,12 @@ function cambiarTurno() {
                     
                     if (puntosJ0 < puntosJ1) {
                         estadoJuego.puntuacionParejas[0] += puntosJ1; 
-                        mensajeTranque += `${estadoJuego.nombreJugador1} gana la ronda y suma ${puntosJ1} puntos. (J0: ${puntosJ0} vs J1: ${puntosJ1})`;
+                        mensajeTranque += `${estadoJuego.nombreJugador1} gana la ronda y suma ${puntosJ1} puntos. (J0: ${puntosJ0} vs ${oponente2JNombre}: ${puntosJ1})`;
                         jugadorConMenosPuntos = {idx: 0, puntos: puntosJ0};
                         parejaGanadoraIdxTranque = 0;
                     } else if (puntosJ1 < puntosJ0) {
                         estadoJuego.puntuacionParejas[1] += puntosJ0; 
-                        mensajeTranque += `Jugador 2 (IA) gana la ronda y suma ${puntosJ0} puntos. (J0: ${puntosJ0} vs J1: ${puntosJ1})`;
+                        mensajeTranque += `${oponente2JNombre} gana la ronda y suma ${puntosJ0} puntos. (J0: ${puntosJ0} vs ${oponente2JNombre}: ${puntosJ1})`;
                         jugadorConMenosPuntos = {idx: 1, puntos: puntosJ1};
                         parejaGanadoraIdxTranque = 1;
                     } else {
@@ -491,10 +512,13 @@ function puedeJugar(mano, extremos) {
  */
 function jugarTurnoIA() {
     let nombreTurnoIA;
-    if (estadoJuego.turnoJugador === 1) nombreTurnoIA = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : "Jugador 2 (IA)";
-    else if (estadoJuego.turnoJugador === 2) nombreTurnoIA = estadoJuego.nombreCompanero;
-    else if (estadoJuego.turnoJugador === 3) nombreTurnoIA = estadoJuego.nombreOponenteIzquierda;
-    else return; 
+    // Asigna el nombre correcto de la IA según el turno y número de jugadores
+    switch (estadoJuego.turnoJugador) {
+        case 1: nombreTurnoIA = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : estadoJuego.nombreCompanero; break; 
+        case 2: nombreTurnoIA = estadoJuego.nombreCompanero; break;
+        case 3: nombreTurnoIA = estadoJuego.nombreOponenteIzquierda; break;
+        default: return; // No debería ocurrir si la lógica de turnos es correcta
+    }
 
     actualizarMensaje(`Turno de ${nombreTurnoIA} (IA), pensando...`);
 
@@ -706,10 +730,11 @@ function actualizarUIMarcador() {
             <p>Pareja 2 (${estadoJuego.nombreOponenteDerecha} y ${estadoJuego.nombreOponenteIzquierda}): ${estadoJuego.puntuacionParejas[1]} puntos</p>
         `;
     } else { // 2 Jugadores
+        // En modo 2 jugadores, el oponente (índice 1) es "Máquina 1" (almacenado en nombreCompanero)
         scoreboardDiv.innerHTML = `
             <h2>Puntuación</h2>
             <p>${estadoJuego.nombreJugador1}: ${estadoJuego.puntuacionParejas[0]} puntos</p>
-            <p>Jugador 2 (IA): ${estadoJuego.puntuacionParejas[1]} puntos</p>
+            <p>${estadoJuego.nombreCompanero}: ${estadoJuego.puntuacionParejas[1]} puntos</p>
         `;
     }
 }
@@ -798,7 +823,7 @@ function mostrarFichaEnMano(ficha, contenedorHTML, jugadorIdx) {
             let nombreTurnoActual = "";
             // Esta parte del código asigna el nombre del jugador actual para el mensaje.
             if(estadoJuego.turnoJugador === 0) nombreTurnoActual = estadoJuego.nombreJugador1; // Esto no debería ocurrir si la condición anterior es verdadera.
-            else if(estadoJuego.turnoJugador === 1) nombreTurnoActual = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : "Jugador 2 (IA)";
+            else if(estadoJuego.turnoJugador === 1) nombreTurnoActual = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : estadoJuego.nombreCompanero; 
             else if(estadoJuego.turnoJugador === 2) nombreTurnoActual = estadoJuego.nombreCompanero;
             else if(estadoJuego.turnoJugador === 3) nombreTurnoActual = estadoJuego.nombreOponenteIzquierda;
             actualizarMensaje(`No es tu turno. Turno de ${nombreTurnoActual}.`);
@@ -960,7 +985,7 @@ function actualizarUIManos() {
     indicesIA.forEach((idxIA) => {
         let idContenedor;
         if (estadoJuego.numeroDeJugadores === 2 && idxIA === 1) {
-            idContenedor = 'player-hand-top';
+            idContenedor = 'player-hand-top'; // Oponente en 2J
         } else if (estadoJuego.numeroDeJugadores === 4) {
             idContenedor = idsContenedoresIA[idxIA];
         } else {
@@ -980,6 +1005,7 @@ function actualizarUIManos() {
                     manoIACont.appendChild(fichaDorsoDiv);
                 });
             } else if (!estadoJuego.juegoIniciado && estadoJuego.manosJugadores[idxIA] && estadoJuego.manosJugadores[idxIA].length > 0) {
+                // Mano revelada al final, gestionada por revelarManoJugadorIA
             } else if (!estadoJuego.juegoIniciado && (!estadoJuego.manosJugadores[idxIA] || estadoJuego.manosJugadores[idxIA].length === 0)) {
                 manoIACont.textContent = "(Mano vacía)";
             }
@@ -1174,16 +1200,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toggleVistaButton = document.getElementById('toggle-vista-fichas-button');
     const toggleAyudaFichasButton = document.getElementById('toggle-ayuda-fichas-button');
+    const contrasteToggleButton = document.getElementById('contraste-toggle-button'); // Nuevo botón de contraste
+    const contrasteIconContainer = document.getElementById('contraste-icon-container');
 
     const nombreGuardado = localStorage.getItem('nombreJugadorDominó');
     if (nombreGuardado) {
         estadoJuego.nombreJugador1 = nombreGuardado;
     }
 
+    // Gestión de la vista de fichas (números o puntos)
     const vistaGuardada = localStorage.getItem('vistaFichas');
-    if (vistaGuardada) {
+    if (vistaGuardada) { // Si hay una preferencia guardada, usarla
         estadoJuego.vistaFichas = vistaGuardada;
+    } else { // Si no hay preferencia guardada, usar el default ('puntos') y guardarlo
+        localStorage.setItem('vistaFichas', estadoJuego.vistaFichas);
     }
+    // Actualizar el texto del botón según el estado final de vistaFichas
     if (toggleVistaButton) {
         toggleVistaButton.textContent = estadoJuego.vistaFichas === 'puntos' ? "Ver Números" : "Ver Puntos";
     }
@@ -1202,24 +1234,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     actualizarUIMarcador(); 
 
+    // Configuración inicial del modo contraste y el icono del botón
     const contrasteGuardado = localStorage.getItem('modoContraste');
     if (contrasteGuardado === 'true') {
         document.body.classList.add('contraste-alto');
+        if (contrasteIconContainer) contrasteIconContainer.textContent = '🌙'; // Luna para modo oscuro
+    } else {
+        if (contrasteIconContainer) contrasteIconContainer.textContent = '☀️'; // Sol para modo claro
     }
 
     const startRoundButton = document.getElementById('start-round-button');
     if (startRoundButton) {
         startRoundButton.addEventListener('click', () => {
-            // console.log("Botón 'Iniciar Nueva Ronda' presionado."); // Log de depuración opcional.
+            // console.log("Botón 'Iniciar Nueva Ronda' presionado."); // Comentado para limpieza
             iniciarNuevaRonda(false); 
         });
     }
     
-    const contrasteButton = document.getElementById('contraste-button');
-    if (contrasteButton) {
-        contrasteButton.addEventListener('click', () => {
+    // Event listener para el nuevo botón de toggle de contraste
+    if (contrasteToggleButton && contrasteIconContainer) {
+        contrasteToggleButton.addEventListener('click', () => {
             document.body.classList.toggle('contraste-alto');
-            localStorage.setItem('modoContraste', document.body.classList.contains('contraste-alto'));
+            const esContrasteAlto = document.body.classList.contains('contraste-alto');
+            localStorage.setItem('modoContraste', esContrasteAlto);
+            contrasteIconContainer.textContent = esContrasteAlto ? '🌙' : '☀️';
         });
     }
 
@@ -1420,3 +1458,46 @@ document.addEventListener('DOMContentLoaded', () => {
         return; 
     }
 });
+
+// --- Funciones de UI Adicionales ---
+/**
+ * Actualiza el resaltado visual para indicar el turno del jugador activo.
+ */
+function actualizarResaltadoTurnoVisual() {
+    const todosLosContenedores = [
+        'player-hand-bottom', 
+        'player-hand-top', 
+        'player-hand-left', 
+        'player-hand-right'
+    ];
+
+    todosLosContenedores.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.classList.remove('turno-activo-visual');
+        }
+    });
+
+    let idContenedorActivo = '';
+    switch (estadoJuego.turnoJugador) {
+        case 0:
+            idContenedorActivo = 'player-hand-bottom';
+            break;
+        case 1:
+            idContenedorActivo = (estadoJuego.numeroDeJugadores === 2) ? 'player-hand-top' : 'player-hand-right';
+            break;
+        case 2: // Solo aplica para 4 jugadores
+            idContenedorActivo = 'player-hand-top';
+            break;
+        case 3: // Solo aplica para 4 jugadores
+            idContenedorActivo = 'player-hand-left';
+            break;
+    }
+
+    if (idContenedorActivo) {
+        const contenedorActivoEl = document.getElementById(idContenedorActivo);
+        if (contenedorActivoEl) {
+            contenedorActivoEl.classList.add('turno-activo-visual');
+        }
+    }
+}
