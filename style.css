@@ -69,6 +69,28 @@ header h1 {
 #game-options button:hover {
     background-color: #45a049; /* Oscurece ligeramente en hover */
 }
+/* Estilo para el nuevo botón de contraste con icono */
+#contraste-toggle-button {
+    font-size: 1.2em; /* Ajusta el tamaño del icono si es necesario */
+    line-height: 1; /* Asegura que el span no añada altura extra */
+    padding: 6px 8px; /* Ajusta el padding para que sea similar a otros botones */
+    background-color: #6c757d; /* Un color gris neutro */
+}
+#contraste-toggle-button:hover {
+    background-color: #5a6268;
+}
+body.contraste-alto #contraste-toggle-button {
+    background-color: #555;
+    border-color: #fff;
+}
+body.contraste-alto #contraste-toggle-button:hover {
+    background-color: #777;
+}
+#contraste-icon-container {
+    display: inline-block; /* Para que el span se comporte como un bloque pero en línea */
+    vertical-align: middle;
+}
+
 
 /* --- Área Principal del Juego (Marcador y Tablero) --- */
 #game-area {
@@ -124,8 +146,18 @@ header h1 {
     flex-wrap: wrap; /* Permite que las fichas se envuelvan si no caben */
     align-items: center; /* Centra las fichas verticalmente */
     justify-content: center; /* Centra las fichas horizontalmente */
-    transition: background-color 0.3s, border-color 0.3s; /* Transición suave para cambios de tema */
+    transition: background-color 0.3s, border-color 0.3s, border-width 0.1s ease-out, border-style 0.1s ease-out; /* Transición suave para cambios de tema y borde */
+    box-sizing: border-box; /* Asegura que el borde no aumente el tamaño visual */
 }
+
+/* Resaltado visual para el jugador activo */
+.turno-activo-visual {
+    border: 3px solid #007bff !important; /* Borde azul brillante. !important para asegurar precedencia si es necesario */
+}
+body.contraste-alto .turno-activo-visual {
+    border-color: #FFD700 !important; /* Borde dorado/amarillo para alto contraste */
+}
+
 
 #player-hand-top {
      min-height: 50px; /* Altura mínima para la mano superior */
@@ -149,8 +181,9 @@ header h1 {
     align-items: center; /* Centra fichas si el espacio lo permite */
     padding: 0.1rem; 
     background-color: #f0f0f0; /* Fondo ligeramente diferente para distinguir */
-    border: 1px dashed #ccc; /* Borde discontinuo */
-    transition: background-color 0.3s, border-color 0.3s;
+    border: 1px dashed #ccc; /* Borde discontinuo por defecto */
+    transition: background-color 0.3s, border-color 0.3s, border-width 0.1s ease-out, border-style 0.1s ease-out;
+    box-sizing: border-box;
     overflow-y: auto; /* Permite scroll vertical si hay muchas fichas (ej. reveladas) */
 }
 
@@ -207,7 +240,7 @@ body.contraste-alto #player-hand-bottom .ficha-domino.ficha-jugable {
     z-index: 15; /* Aún más arriba */
 }
 
-/* Estilo para el foco del teclado (puede ser el mismo que el hover o uno específico) */
+/* Estilo para el foco del teclado (aplicado a fichas en la mano del jugador humano) */
 #player-hand-bottom .ficha-domino:focus {
     outline: 2px solid dodgerblue; /* Indicador de foco claro y estándar */
     outline-offset: 1px; /* Pequeño espacio entre la ficha y el outline */
@@ -215,7 +248,7 @@ body.contraste-alto #player-hand-bottom .ficha-domino.ficha-jugable {
     box-shadow: 0px 3px 10px rgba(0, 100, 200, 0.4); /* Sombra azulada para el foco */
     z-index: 12; /* Alto z-index para el foco */
 }
-/* Estilo de foco para fichas que también son jugables */
+/* Estilo de foco para fichas que también son jugables (si la ayuda está activa) */
 #player-hand-bottom .ficha-domino.ficha-jugable:focus {
     outline-color: green; /* Foco verde si es jugable */
     transform: scale(1.05) translateY(-5px); /* Mayor elevación */
@@ -403,6 +436,14 @@ body.contraste-alto #game-options button {
 }
 body.contraste-alto #game-options button:hover {
     background-color: #555;
+}
+/* Estilo para el nuevo botón de contraste con icono en modo contraste alto */
+body.contraste-alto #contraste-toggle-button {
+    background-color: #666; /* Un gris más claro para destacar sobre fondo negro */
+    border-color: #fff;
+}
+body.contraste-alto #contraste-toggle-button:hover {
+    background-color: #888;
 }
 
 
@@ -648,9 +689,18 @@ body.contraste-alto #game-options #toggle-ayuda-fichas-button:hover {
     cursor: pointer;
     opacity: 0.8; /* Ligera transparencia */
 }
+/* Estilo de foco para los extremos jugables en el tablero */
+.extremo-jugable:focus {
+    outline-style: solid; /* Cambia a sólido en foco para mayor claridad */
+    opacity: 1;
+}
 body.contraste-alto .extremo-jugable {
     outline-color: #ffc107; /* Outline amarillo en contraste alto */
 }
+body.contraste-alto .extremo-jugable:focus {
+    outline-color: #fff2cc; /* Un amarillo más claro para el foco en contraste */
+}
+
 
 /* Animación para botones de llamada a la acción */
 @keyframes pulseAnimation {
@@ -992,6 +1042,11 @@ body.contraste-alto .punto-domino {
     /* Restaura tamaños y espaciados originales para escritorio */
     header h1 { font-size: 1.8em; } 
     #game-options button { font-size: 0.9em; padding: 8px 12px;}
+     /* Estilo para el nuevo botón de contraste con icono en desktop */
+    #contraste-toggle-button {
+        font-size: 1em; /* Tamaño de icono normal para desktop */
+        padding: 8px 10px; 
+    }
     #game-area { padding: 0.5rem; }
     #scoreboard { width: 20%; min-width: 180px; padding: 0.5rem; }
     #game-board { width: 80%; padding: 0.5rem; }
@@ -1044,3 +1099,5 @@ body.contraste-alto .punto-domino {
     #scoreboard { width: 15%; min-width: 200px; } /* Menos ancho para el marcador, más para el juego */
     #game-board { width: 85%; }
 }
+
+[end of style.css]
