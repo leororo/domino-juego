@@ -1,4 +1,6 @@
 // Lógica del Juego de Dominó Cubano Doble 9
+// Autor: Tu Nombre/Alias (o dejar en blanco)
+// Fecha: 2024 (o fecha actual)
 
 // --- Variables Globales para el Estado del Juego ---
 let estadoJuego = {
@@ -22,6 +24,7 @@ let estadoJuego = {
 
 let fichaSeleccionadaParaJugar = null; 
 let windowFichaEnZoom = null; 
+let elementoEnfocadoAntesDelZoom = null; // Variable para guardar el elemento enfocado antes de abrir el popup de zoom
 
 
 // --- Funciones de Lógica del Juego ---
@@ -152,7 +155,7 @@ function iniciarNuevaRonda(esNuevaPartida = false) {
     estadoJuego.consecutivePasses = 0; 
     fichaSeleccionadaParaJugar = null; 
     limpiarResaltadoExtremos(); 
-    estadoJuego.ultimaFichaJugadaId = null; // Resetear para scroll
+    estadoJuego.ultimaFichaJugadaId = null; 
     
     if (esNuevaPartida) {
         estadoJuego.puntuacionParejas = [0, 0]; 
@@ -232,7 +235,8 @@ function limpiarResaltadoExtremos() {
 
 
 function jugarFicha(fichaOriginal, extremoDelTableroAlQueConecta) {
-    console.log('DEBUG: Entrando en jugarFicha con:', JSON.parse(JSON.stringify(fichaOriginal)), 'Extremo:', extremoDelTableroAlQueConecta, 'Tablero actual:', JSON.parse(JSON.stringify(estadoJuego.fichasEnTablero)));
+    // Comentario de depuración eliminado, la funcionalidad es estable.
+    // console.log('DEBUG: Entrando en jugarFicha con:', JSON.parse(JSON.stringify(fichaOriginal)), 'Extremo:', extremoDelTableroAlQueConecta, 'Tablero actual:', JSON.parse(JSON.stringify(estadoJuego.fichasEnTablero)));
 
     if (!estadoJuego.juegoIniciado) {
         actualizarMensaje("El juego ha terminado o no ha iniciado. Presiona 'Iniciar Nueva Ronda' o 'Nueva Partida'.");
@@ -245,6 +249,7 @@ function jugarFicha(fichaOriginal, extremoDelTableroAlQueConecta) {
     const manoActual = estadoJuego.manosJugadores[estadoJuego.turnoJugador];
     const indiceFichaEnMano = manoActual.findIndex(f => f.id === fichaOriginal.id);
     
+    // Este error solo debería ocurrir si hay un problema de lógica grave.
     if (indiceFichaEnMano === -1 && estadoJuego.fichasEnTablero.length > 0) { 
         console.error("Error: Ficha no encontrada en la mano del jugador.", fichaOriginal);
         actualizarMensaje("Error: Ficha no encontrada en tu mano.");
@@ -254,7 +259,7 @@ function jugarFicha(fichaOriginal, extremoDelTableroAlQueConecta) {
     if (estadoJuego.fichasEnTablero.length === 0) { 
         fichaParaJugarComo = { ...fichaOriginal };
         estadoJuego.fichasEnTablero.push({ fichaOriginal, jugadaComo: fichaParaJugarComo });
-        console.log('DEBUG: Ficha añadida a fichasEnTablero (primera ficha). Nuevo estado:', JSON.parse(JSON.stringify(estadoJuego.fichasEnTablero)));
+        // console.log('DEBUG: Ficha añadida a fichasEnTablero (primera ficha).'); // Log de depuración eliminado
     } else {
         const [extIzquierdo, extDerecho] = estadoJuego.extremosAbiertos; 
         if (extremoDelTableroAlQueConecta === extIzquierdo) { 
@@ -266,7 +271,7 @@ function jugarFicha(fichaOriginal, extremoDelTableroAlQueConecta) {
                  actualizarMensaje("Movimiento inválido (ficha no coincide con extremo izquierdo)."); return;
             }
             estadoJuego.fichasEnTablero.unshift({ fichaOriginal, jugadaComo: fichaParaJugarComo });
-            console.log('DEBUG: Ficha añadida a fichasEnTablero (unshift). Nuevo estado:', JSON.parse(JSON.stringify(estadoJuego.fichasEnTablero)));
+            // console.log('DEBUG: Ficha añadida a fichasEnTablero (unshift).'); // Log de depuración eliminado
         } else if (extremoDelTableroAlQueConecta === extDerecho) { 
             if (fichaOriginal.ladoA === extremoDelTableroAlQueConecta) {
                 fichaParaJugarComo = { ladoA: fichaOriginal.ladoA, ladoB: fichaOriginal.ladoB, id: fichaOriginal.id };
@@ -276,19 +281,19 @@ function jugarFicha(fichaOriginal, extremoDelTableroAlQueConecta) {
                 actualizarMensaje("Movimiento inválido (ficha no coincide con extremo derecho)."); return;
             }
             estadoJuego.fichasEnTablero.push({ fichaOriginal, jugadaComo: fichaParaJugarComo });
-            console.log('DEBUG: Ficha añadida a fichasEnTablero (push). Nuevo estado:', JSON.parse(JSON.stringify(estadoJuego.fichasEnTablero)));
+            // console.log('DEBUG: Ficha añadida a fichasEnTablero (push).'); // Log de depuración eliminado
         } else {
             actualizarMensaje("Extremo del tablero no válido seleccionado."); return;
         }
     }
-    estadoJuego.ultimaFichaJugadaId = fichaOriginal.id; // Guardar ID para scroll
+    estadoJuego.ultimaFichaJugadaId = fichaOriginal.id; 
 
     if (indiceFichaEnMano !== -1) { 
        manoActual.splice(indiceFichaEnMano, 1);
     }
     estadoJuego.extremosAbiertos = obtenerExtremosAbiertos();
     actualizarUIManos(); 
-    actualizarUITablero(); // Esto redibuja el tablero y llamará a configurarDropZones y al scroll
+    actualizarUITablero(); 
     actualizarResaltadoFichasJugables(); 
     estadoJuego.consecutivePasses = 0; 
 
@@ -473,7 +478,16 @@ function puedeJugar(mano, extremos) {
 // --- Funciones para la UI ---
 
 /**
- * Placeholder para la lógica de la IA.
+ * Determina y ejecuta el turno de la IA.
+ * La IA sigue una estrategia mejorada:
+ * 1. Si es la primera jugada de la IA en la ronda (tablero vacío):
+ *    - Si es la salida obligada (determinada por `determinarSalidaPrimeraRonda`), juega esa ficha.
+ *    - Sino, juega su doble más alto. Si no tiene dobles, su ficha de mayor puntuación.
+ * 2. Si el tablero no está vacío:
+ *    - Recopila todas las jugadas válidas.
+ *    - Prioridad 1: Jugar dobles. Si hay varios, el de mayor valor.
+ *    - Prioridad 2: Jugar la ficha no doble de mayor puntuación.
+ *    - Si no hay jugadas válidas (lo cual no debería ocurrir si `puedeJugar` se verificó antes), pasa.
  */
 function jugarTurnoIA() {
     let nombreTurnoIA;
@@ -485,52 +499,83 @@ function jugarTurnoIA() {
     actualizarMensaje(`Turno de ${nombreTurnoIA} (IA), pensando...`);
 
     setTimeout(() => {
-        if (!estadoJuego.juegoIniciado) return; 
+        if (!estadoJuego.juegoIniciado) return;
 
         const manoIA = estadoJuego.manosJugadores[estadoJuego.turnoJugador];
         const [extIzquierdo, extDerecho] = obtenerExtremosAbiertos();
         let fichaAJugar = null;
         let extremoElegido = null;
 
-        for (const ficha of manoIA) {
-            if (esMovimientoValido(ficha, extIzquierdo)) {
-                fichaAJugar = ficha;
-                extremoElegido = extIzquierdo;
-                break;
+        // 1. Manejo de la primera jugada de la IA en la ronda (tablero vacío)
+        if (extIzquierdo === null && manoIA.length > 0) {
+            const dataSalida = determinarSalidaPrimeraRonda(estadoJuego.manosJugadores);
+            // Si es la salida obligada por ser el doble más alto general, etc.
+            if (estadoJuego.turnoJugador === dataSalida.jugadorIdx && dataSalida.fichaDeSalida) {
+                fichaAJugar = dataSalida.fichaDeSalida;
+            } else {
+                // Si no es salida obligada (ej. otros pasaron), IA elige su mejor ficha para abrir.
+                // Prioridad 1: Doble más alto.
+                let mejoresDobles = manoIA.filter(f => f.ladoA === f.ladoB).sort((a, b) => b.ladoA - a.ladoA);
+                if (mejoresDobles.length > 0) {
+                    fichaAJugar = mejoresDobles[0];
+                } else {
+                    // Prioridad 2: Ficha de mayor puntuación.
+                    manoIA.sort((a, b) => (b.ladoA + b.ladoB) - (a.ladoA + a.ladoB));
+                    fichaAJugar = manoIA[0];
+                }
             }
-        }
-        if (!fichaAJugar) {
+            extremoElegido = null; // Primera jugada siempre es null para el extremo
+        } else {
+            // 2. Buscar todas las jugadas válidas
+            const jugadasValidas = [];
             for (const ficha of manoIA) {
-                if (esMovimientoValido(ficha, extDerecho)) {
-                    fichaAJugar = ficha;
-                    extremoElegido = extDerecho;
-                    break;
+                const puntuacion = ficha.ladoA + ficha.ladoB;
+                const esDoble = ficha.ladoA === ficha.ladoB;
+                if (esMovimientoValido(ficha, extIzquierdo)) {
+                    jugadasValidas.push({ ficha, extremo: extIzquierdo, esDoble, puntuacion });
+                }
+                // Evitar duplicar si la ficha puede jugarse en ambos extremos y los extremos son iguales
+                if (extIzquierdo !== extDerecho && esMovimientoValido(ficha, extDerecho)) {
+                    jugadasValidas.push({ ficha, extremo: extDerecho, esDoble, puntuacion });
+                }
+            }
+
+            if (jugadasValidas.length > 0) {
+                // 3. Prioridad 1: Jugar Dobles
+                const doblesValidos = jugadasValidas.filter(j => j.esDoble);
+                if (doblesValidos.length > 0) {
+                    // Jugar el doble de mayor valor si hay varios
+                    doblesValidos.sort((a, b) => b.puntuacion - a.puntuacion);
+                    fichaAJugar = doblesValidos[0].ficha;
+                    extremoElegido = doblesValidos[0].extremo;
+                } else {
+                    // 4. Prioridad 2: Ficha de Mayor Puntuación
+                    jugadasValidas.sort((a, b) => b.puntuacion - a.puntuacion);
+                    // Si hay empate en puntuación, esta clasificación ya toma la primera encontrada.
+                    fichaAJugar = jugadasValidas[0].ficha;
+                    extremoElegido = jugadasValidas[0].extremo;
                 }
             }
         }
-        
-        if (extIzquierdo === null && manoIA.length > 0) { 
-            const dataSalida = determinarSalidaPrimeraRonda(estadoJuego.manosJugadores); 
-            if(estadoJuego.turnoJugador === dataSalida.jugadorIdx && dataSalida.fichaDeSalida){
-                fichaAJugar = dataSalida.fichaDeSalida;
-            } else { 
-                fichaAJugar = manoIA[0]; 
-            }
-            extremoElegido = null;
-        }
 
-
+        // 5. Ejecutar la jugada
         if (fichaAJugar) {
             actualizarMensaje(`${nombreTurnoIA} (IA) juega ${fichaAJugar.ladoA}-${fichaAJugar.ladoB}.`);
             jugarFicha(fichaAJugar, extremoElegido);
         } else {
-            console.warn(`${nombreTurnoIA} (IA) no encontró jugada, pero esto debería haber sido manejado por puedeJugar y cambiarTurno.`);
-            if(estadoJuego.juegoIniciado) cambiarTurno(); 
+            // Esto no debería ocurrir si puedeJugar() fue llamado correctamente antes de llamar a jugarTurnoIA.
+            // Pero como fallback, si no se encontró jugada (y debería haberla), se pasa el turno.
+            // console.warn(`${nombreTurnoIA} (IA) no encontró jugada, pero esto debería haber sido manejado por puedeJugar y cambiarTurno.`); // Comentado, la IA debería pasar.
+            if(estadoJuego.juegoIniciado) cambiarTurno(); // La IA pasa si no puede encontrar una jugada
         }
     }, 1000 + Math.random() * 1000); 
 }
 
-
+/**
+ * Muestra las fichas de un jugador IA al final de una ronda o en un tranque.
+ * @param {number} jugadorIdx - Índice del jugador IA.
+ * @param {boolean} esGanadorTranque - Indica si este jugador fue el ganador en un tranque.
+ */
 function revelarManoJugadorIA(jugadorIdx, esGanadorTranque = false) {
     let idContenedor = '';
     let esManoLateral = false; 
@@ -588,39 +633,58 @@ function revelarManoJugadorIA(jugadorIdx, esGanadorTranque = false) {
 function actualizarResaltadoFichasJugables() {
     const manoHumanoDiv = document.getElementById('player-hand-bottom');
     if (!manoHumanoDiv) return;
+    // Limpia resaltados y tabindex de todas las fichas del jugador humano.
     manoHumanoDiv.querySelectorAll('.ficha-domino').forEach(fichaDiv => {
         fichaDiv.classList.remove('ficha-jugable');
+        fichaDiv.removeAttribute('tabindex'); 
+        // El aria-label se actualizará después, indicando si es jugable o no.
     });
 
-    if (!estadoJuego.ayudaFichasJugablesActiva) { 
+    // Si no es el turno del jugador humano o el juego no ha iniciado, no hacer nada más.
+    if (estadoJuego.turnoJugador !== 0 || !estadoJuego.juegoIniciado) {
         return; 
     }
 
-    if (estadoJuego.turnoJugador !== 0 || !estadoJuego.juegoIniciado) {
-        return;
-    }
+    // Obtener la mano del jugador humano.
     const manoHumano = estadoJuego.manosJugadores[0];
-    if (!manoHumano) return; 
+    if (!manoHumano) return;
+
     const [extIzquierdo, extDerecho] = obtenerExtremosAbiertos();
+    
+    // Itera sobre cada ficha en la mano del jugador humano.
     manoHumano.forEach(ficha => {
-        let esJugable = false;
-        if (extIzquierdo === null) { 
-            esJugable = true;
-        } else {
+        const fichaDiv = manoHumanoDiv.querySelector(`.ficha-domino[data-id='${ficha.id}']`);
+        if (!fichaDiv) return; // Si no se encuentra el div de la ficha, saltar.
+
+        // Determina si la ficha es realmente jugable.
+        let esJugableRealmente = false;
+        if (extIzquierdo === null) { // Es la primera jugada de la ronda.
+            esJugableRealmente = true;
+        } else { // Hay fichas en el tablero.
             if (esMovimientoValido(ficha, extIzquierdo) || esMovimientoValido(ficha, extDerecho)) {
-                esJugable = true;
+                esJugableRealmente = true;
             }
         }
-        if (esJugable) {
-            const fichaDiv = manoHumanoDiv.querySelector(`.ficha-domino[data-id='${ficha.id}']`);
-            if (fichaDiv) {
+
+        // Si la ficha es jugable:
+        if (esJugableRealmente) {
+            fichaDiv.setAttribute('tabindex', '0'); // Hacerla enfocable con teclado.
+            fichaDiv.setAttribute('aria-label', `Ficha ${ficha.ladoA}-${ficha.ladoB}, jugable`); // Etiqueta ARIA descriptiva.
+            // Si la ayuda está activa, resaltar visualmente.
+            if (estadoJuego.ayudaFichasJugablesActiva) {
                 fichaDiv.classList.add('ficha-jugable');
             }
+        } else { // Si la ficha no es jugable:
+            fichaDiv.classList.remove('ficha-jugable'); // Asegurar que no esté resaltada.
+            fichaDiv.setAttribute('aria-label', `Ficha ${ficha.ladoA}-${ficha.ladoB}, no jugable`); // Etiqueta ARIA descriptiva.
         }
     });
 }
 
-
+/**
+ * Actualiza el contenido del div de mensajes del juego.
+ * @param {string} texto - El mensaje a mostrar.
+ */
 function actualizarMensaje(texto) {
     const gameMessagesDiv = document.getElementById('game-messages');
     if (gameMessagesDiv) {
@@ -667,6 +731,14 @@ function mostrarFichaEnMano(ficha, contenedorHTML, jugadorIdx) {
     fichaDiv.dataset.ladoA = fichaClicada.ladoA;
     fichaDiv.dataset.ladoB = fichaClicada.ladoB;
     fichaDiv.dataset.id = fichaClicada.id;
+    fichaDiv.setAttribute('role', 'button'); // Asigna el rol ARIA de botón para accesibilidad.
+    // El tabindex se gestiona dinámicamente por `actualizarResaltadoFichasJugables` para el jugador humano.
+    // Las fichas de otros jugadores o las no jugables no serán enfocables por teclado.
+    if (jugadorIdx !== 0) { // Fichas de IA
+        fichaDiv.setAttribute('tabindex', '-1'); // Asegura que las fichas de la IA no sean enfocables.
+    }
+    // Para el jugador humano, tabindex se establece en actualizarResaltadoFichasJugables
+
 
     const ladoADiv = document.createElement('div'); 
     ladoADiv.classList.add('mitad-ficha-canvas'); 
@@ -712,96 +784,149 @@ function mostrarFichaEnMano(ficha, contenedorHTML, jugadorIdx) {
         });
     }
 
+    // Función interna para manejar el intento de jugar una ficha (por clic o teclado).
+    const handleTilePlayAttempt = () => {
+        // Solo se aplica al jugador humano (jugadorIdx === 0).
+        if (jugadorIdx !== 0) return;
 
-    fichaDiv.addEventListener('click', () => {
         if (!estadoJuego.juegoIniciado) {
             actualizarMensaje("El juego ha terminado o no ha iniciado. Presiona 'Iniciar Nueva Ronda' o 'Nueva Partida'.");
             return;
         }
-        if (estadoJuego.turnoJugador !== jugadorIdx) {
+        // Verifica si es el turno del jugador humano.
+        if (estadoJuego.turnoJugador !== 0) { 
             let nombreTurnoActual = "";
-            if(estadoJuego.turnoJugador === 0) nombreTurnoActual = estadoJuego.nombreJugador1;
+            // Esta parte del código asigna el nombre del jugador actual para el mensaje.
+            if(estadoJuego.turnoJugador === 0) nombreTurnoActual = estadoJuego.nombreJugador1; // Esto no debería ocurrir si la condición anterior es verdadera.
             else if(estadoJuego.turnoJugador === 1) nombreTurnoActual = (estadoJuego.numeroDeJugadores === 4) ? estadoJuego.nombreOponenteDerecha : "Jugador 2 (IA)";
             else if(estadoJuego.turnoJugador === 2) nombreTurnoActual = estadoJuego.nombreCompanero;
             else if(estadoJuego.turnoJugador === 3) nombreTurnoActual = estadoJuego.nombreOponenteIzquierda;
             actualizarMensaje(`No es tu turno. Turno de ${nombreTurnoActual}.`);
             return;
         }
+        
+        // Check if the specific tile is considered playable by current highlighting logic
+        // (This check is mainly for keyboard interaction; click might bypass if help is off)
+        const isVisuallyPlayable = fichaDiv.classList.contains('ficha-jugable');
+        const isFocusable = fichaDiv.getAttribute('tabindex') === '0';
+
+        if (!isFocusable && !isVisuallyPlayable && estadoJuego.ayudaFichasJugablesActiva) {
+             // If help is on and the tile isn't marked (visually or focus-wise), prevent play.
+            actualizarMensaje(`La ficha ${fichaClicada.ladoA}-${fichaClicada.ladoB} no es jugable en este momento.`);
+            return;
+        }
+
 
         if (fichaSeleccionadaParaJugar && fichaSeleccionadaParaJugar.id !== fichaClicada.id) {
             limpiarResaltadoExtremos();
-            fichaSeleccionadaParaJugar = null; 
-        }
-        else if (fichaSeleccionadaParaJugar && fichaSeleccionadaParaJugar.id === fichaClicada.id) {
+            fichaSeleccionadaParaJugar = null;
+        } else if (fichaSeleccionadaParaJugar && fichaSeleccionadaParaJugar.id === fichaClicada.id) {
             limpiarResaltadoExtremos();
             fichaSeleccionadaParaJugar = null;
             actualizarMensaje(`Selección de ${fichaClicada.ladoA}-${fichaClicada.ladoB} cancelada. Elige una ficha.`);
-            actualizarResaltadoFichasJugables(); 
-            return; 
+            actualizarResaltadoFichasJugables();
+            return;
         }
-        
+
         const [extIzquierdo, extDerecho] = obtenerExtremosAbiertos();
 
-        if (extIzquierdo === null) { 
+        if (extIzquierdo === null) {
             jugarFicha(fichaClicada, null);
         } else {
             const puedeConectarIzquierdo = esMovimientoValido(fichaClicada, extIzquierdo);
             const puedeConectarDerecho = esMovimientoValido(fichaClicada, extDerecho);
             const esDoble = fichaClicada.ladoA === fichaClicada.ladoB;
 
+            if (!puedeConectarIzquierdo && !puedeConectarDerecho) {
+                actualizarMensaje(`Esta ficha (${fichaClicada.ladoA}-${fichaClicada.ladoB}) no se puede jugar en ningún extremo.`);
+                return;
+            }
+
             if (esDoble) {
-                if (puedeConectarIzquierdo) {
-                    jugarFicha(fichaClicada, extIzquierdo);
-                } else if (puedeConectarDerecho) {
-                    jugarFicha(fichaClicada, extDerecho);
-                } else {
-                    actualizarMensaje("Este doble no se puede jugar en ningún extremo.");
-                }
-            } else { 
+                if (puedeConectarIzquierdo) jugarFicha(fichaClicada, extIzquierdo);
+                else if (puedeConectarDerecho) jugarFicha(fichaClicada, extDerecho);
+            } else { // Not a double
                 if (puedeConectarIzquierdo && puedeConectarDerecho) {
-                    if (extIzquierdo === extDerecho) { 
-                        jugarFicha(fichaClicada, extIzquierdo); 
-                    } else { 
-                        limpiarResaltadoExtremos(); 
+                    if (extIzquierdo === extDerecho) {
+                        jugarFicha(fichaClicada, extIzquierdo);
+                    } else {
+                        limpiarResaltadoExtremos();
                         fichaSeleccionadaParaJugar = fichaClicada;
-                        actualizarMensaje(`Has seleccionado ${fichaClicada.ladoA}-${fichaClicada.ladoB}. Haz clic en el extremo del tablero donde quieres jugarla.`);
-                        document.getElementById('player-hand-bottom').querySelectorAll('.ficha-domino.ficha-jugable').forEach(fD => fD.classList.remove('ficha-jugable'));
+                        actualizarMensaje(`Has seleccionado ${fichaClicada.ladoA}-${fichaClicada.ladoB}. Elige el extremo del tablero (clic o Enter/Espacio).`);
                         
+                        // Make only the selected tile focusable in hand, remove 'ficha-jugable' from others
+                        document.getElementById('player-hand-bottom').querySelectorAll('.ficha-domino').forEach(fD => {
+                            if (fD !== fichaDiv) {
+                                fD.classList.remove('ficha-jugable'); // Visually de-emphasize others
+                                fD.setAttribute('tabindex', '-1');
+                            } else {
+                                fD.setAttribute('tabindex', '0'); // Ensure selected one remains focusable
+                            }
+                        });
+
                         const tableroDiv = document.getElementById('domino-table');
                         const fichasEnTableroUI = Array.from(tableroDiv.children);
+                        let firstFocusableEnd = null;
+
+                        const setupEndPlayHandler = (endElement, extremoValor, isFirst) => {
+                            endElement.classList.add('extremo-jugable');
+                            endElement.setAttribute('tabindex', '0');
+                            endElement.setAttribute('aria-label', `Jugar ficha ${fichaClicada.ladoA}-${fichaClicada.ladoB} en extremo ${extremoValor}`);
+                            if (isFirst) firstFocusableEnd = endElement;
+
+                            const endInteractionHandler = (event) => {
+                                if (event.type === 'click' || (event.type === 'keydown' && (event.key === 'Enter' || event.key === ' '))) {
+                                    event.preventDefault();
+                                    event.stopPropagation(); // Prevent triggering other listeners
+                                    if (fichaSeleccionadaParaJugar && fichaSeleccionadaParaJugar.id === fichaClicada.id) {
+                                        jugarFicha(fichaSeleccionadaParaJugar, extremoValor);
+                                    }
+                                    // Clean up immediately after interaction
+                                    fichasEnTableroUI.forEach(el => {
+                                        el.classList.remove('extremo-jugable');
+                                        el.removeAttribute('tabindex');
+                                        el.removeAttribute('aria-label');
+                                        // Remove these specific listeners if possible, though {once:true} helps
+                                    });
+                                    actualizarResaltadoFichasJugables(); // Restore hand focusability
+                                }
+                            };
+                            // Add listeners with {once: true} to auto-remove after firing
+                            endElement.addEventListener('click', endInteractionHandler, { once: true });
+                            endElement.addEventListener('keydown', endInteractionHandler, { once: true });
+                        };
+
                         if (fichasEnTableroUI.length > 0) {
                             const fichaUIExtIzquierdo = fichasEnTableroUI[0];
                             const fichaUIExtDerecho = fichasEnTableroUI[fichasEnTableroUI.length - 1];
                             
-                            const clickHandlerIzquierdo = () => {
-                                if (fichaSeleccionadaParaJugar && fichaSeleccionadaParaJugar.id === fichaClicada.id) {
-                                    jugarFicha(fichaSeleccionadaParaJugar, extIzquierdo);
-                                }
-                            };
-                            fichaUIExtIzquierdo.classList.add('extremo-jugable');
-                            fichaUIExtIzquierdo.addEventListener('click', clickHandlerIzquierdo, { once: true });
-
+                            setupEndPlayHandler(fichaUIExtIzquierdo, extIzquierdo, true);
                             if (fichaUIExtIzquierdo !== fichaUIExtDerecho) {
-                                const clickHandlerDerecho = () => {
-                                    if (fichaSeleccionadaParaJugar && fichaSeleccionadaParaJugar.id === fichaClicada.id) {
-                                        jugarFicha(fichaSeleccionadaParaJugar, extDerecho);
-                                    }
-                                };
-                                fichaUIExtDerecho.classList.add('extremo-jugable');
-                                fichaUIExtDerecho.addEventListener('click', clickHandlerDerecho, { once: true });
+                                setupEndPlayHandler(fichaUIExtDerecho, extDerecho, false);
                             }
+                            if (firstFocusableEnd) firstFocusableEnd.focus(); // Focus the first highlighted end
                         }
                     }
                 } else if (puedeConectarIzquierdo) {
                     jugarFicha(fichaClicada, extIzquierdo);
                 } else if (puedeConectarDerecho) {
                     jugarFicha(fichaClicada, extDerecho);
-                } else {
-                    actualizarMensaje("Esta ficha no se puede jugar en ningún extremo.");
                 }
             }
         }
-    });
+    };
+
+    fichaDiv.addEventListener('click', handleTilePlayAttempt);
+
+    if (jugadorIdx === 0) { // Only add keydown for human player tiles
+        fichaDiv.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault(); // Prevent default spacebar scroll
+                handleTilePlayAttempt();
+            }
+        });
+    }
+
     contenedorHTML.appendChild(fichaDiv);
     return fichaDiv;
 }
@@ -898,11 +1023,17 @@ function mostrarFichaEnTableroUI(fichaJugadaObj, contenedorTablero) {
     fichaDiv.appendChild(separadorVisual); 
     fichaDiv.appendChild(ladoBDiv);
     
+    // Event listener para el zoom de la ficha en el tablero
     fichaDiv.addEventListener('click', () => {
         if (!fichaSeleccionadaParaJugar && !fichaDiv.classList.contains('extremo-jugable')) {
             windowFichaEnZoom = fichaJugadaObj.fichaOriginal; 
             const zoomPopup = document.getElementById('zoom-popup');
             const zoomContenido = document.getElementById('zoom-contenido');
+            const zoomCerrarButton = document.getElementById('zoom-cerrar-button');
+            
+            // Guardar el elemento que tenía el foco (la ficha del tablero)
+            elementoEnfocadoAntesDelZoom = document.activeElement; 
+
             zoomContenido.innerHTML = ''; 
             
             const fichaZoomDiv = document.createElement('div');
@@ -932,14 +1063,17 @@ function mostrarFichaEnTableroUI(fichaJugadaObj, contenedorTablero) {
             fichaZoomDiv.appendChild(separadorZoom);
             fichaZoomDiv.appendChild(ladoBZoom);
             zoomContenido.appendChild(fichaZoomDiv);
-            zoomPopup.style.display = 'flex'; 
+            zoomPopup.style.display = 'flex';
+            if (zoomCerrarButton) {
+                zoomCerrarButton.focus(); // Mover foco al botón de cerrar
+            }
         }
     });
     contenedorTablero.appendChild(fichaDiv);
 }
 
 function actualizarUITablero() {
-    console.log('DEBUG: Entrando en actualizarUITablero. Fichas en tablero:', JSON.parse(JSON.stringify(estadoJuego.fichasEnTablero)));
+    // console.log('DEBUG: Entrando en actualizarUITablero...'); // Log de depuración eliminado
     const contenedorTablero = document.getElementById('domino-table');
     if (!contenedorTablero) return;
     contenedorTablero.innerHTML = ''; 
@@ -953,7 +1087,7 @@ function actualizarUITablero() {
         if (fichaUI && typeof fichaUI.scrollIntoView === 'function') {
             fichaUI.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
         }
-        estadoJuego.ultimaFichaJugadaId = null; // Resetear después del scroll
+        estadoJuego.ultimaFichaJugadaId = null; 
     }
 }
 
@@ -1076,7 +1210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startRoundButton = document.getElementById('start-round-button');
     if (startRoundButton) {
         startRoundButton.addEventListener('click', () => {
-            console.log("Botón 'Iniciar Nueva Ronda' presionado.");
+            // console.log("Botón 'Iniciar Nueva Ronda' presionado."); // Log de depuración opcional.
             iniciarNuevaRonda(false); 
         });
     }
@@ -1235,26 +1369,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const zoomPopup = document.getElementById('zoom-popup');
     const zoomCerrarButton = document.getElementById('zoom-cerrar-button');
 
-    if (zoomCerrarButton && zoomPopup) { 
-        zoomCerrarButton.addEventListener('click', () => {
+    // Manejador para cerrar el popup de zoom y restaurar el foco
+    if (zoomCerrarButton && zoomPopup) {
+        const cerrarZoomHandler = () => {
             zoomPopup.style.display = 'none';
-            windowFichaEnZoom = null; 
-        });
+            windowFichaEnZoom = null;
+            if (elementoEnfocadoAntesDelZoom && typeof elementoEnfocadoAntesDelZoom.focus === 'function') {
+                elementoEnfocadoAntesDelZoom.focus();
+            }
+            elementoEnfocadoAntesDelZoom = null;
+        };
+        zoomCerrarButton.addEventListener('click', cerrarZoomHandler);
     }
+
+    // Cerrar popup de zoom si se hace clic fuera del contenido (en el backdrop)
     if (zoomPopup) {
         zoomPopup.addEventListener('click', (event) => {
-            if (event.target === zoomPopup) { 
+            if (event.target === zoomPopup) { // Clicked on backdrop
                 zoomPopup.style.display = 'none';
-                windowFichaEnZoom = null; 
+                windowFichaEnZoom = null;
+                if (elementoEnfocadoAntesDelZoom && typeof elementoEnfocadoAntesDelZoom.focus === 'function') {
+                    elementoEnfocadoAntesDelZoom.focus();
+                }
+                elementoEnfocadoAntesDelZoom = null;
             }
         });
     }
+
+    // Añadir event listener para la tecla 'Escape' en el popup de zoom
+    if (zoomPopup) {
+        zoomPopup.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                if (zoomPopup.style.display === 'flex') {
+                    // Reutilizar la lógica del botón de cerrar o llamar directamente al manejador
+                    const cerrarButton = document.getElementById('zoom-cerrar-button');
+                    if (cerrarButton) cerrarButton.click(); // Simula un clic para asegurar la misma lógica de limpieza y foco
+                }
+            }
+        });
+    }
+
 
     if (mainMenuDiv && appContainerDiv) {
         mainMenuDiv.classList.remove('hidden');
         appContainerDiv.classList.add('hidden');
         if (subMenuPracticaDiv) subMenuPracticaDiv.classList.add('hidden'); 
     } else {
+        // Este error es crítico si los contenedores principales no se encuentran.
         console.error("Error: No se encontraron los contenedores mainMenuDiv o appContainerDiv.");
         return; 
     }

@@ -65,18 +65,19 @@
         </div>
 
         <footer>
-            <div id="game-messages">
+            <div id="game-messages" aria-live="polite">
                 <!-- Mensajes y notificaciones del juego -->
             </div>
             <p>&copy; 2025 Juego de Dominó</p>
         </footer>
     </div>
 
-    <div id="zoom-popup" style="display: none;">
+    <div id="zoom-popup" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="zoom-popup-title">
         <div id="zoom-contenido">
+            <h3 id="zoom-popup-title" style="position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;">Ficha Ampliada</h3>
             <!-- La ficha ampliada se insertará aquí -->
         </div>
-        <button id="zoom-cerrar-button">&times;</button>
+        <button id="zoom-cerrar-button" aria-label="Cerrar zoom">&times;</button>
     </div>
 
     <script src="script.js"></script>
