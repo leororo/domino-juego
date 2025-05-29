@@ -10,7 +10,7 @@
     <div id="main-menu">
         <h1>Dominó Cubano Doble 9</h1>
         <div class="menu-options">
-            <button id="practice-button" class="menu-button">Practicar (vs IA)</button>
+            <button id="practice-button" class="menu-button">Practicar</button>
             <button id="online-button" class="menu-button" disabled>Online (Próximamente)</button>
             <button id="friends-button" class="menu-button" disabled>Con Amigos (Próximamente)</button>
         </div>
@@ -18,8 +18,8 @@
     <div id="sub-menu-practica" class="hidden"> <!-- Inicia oculto -->
         <h2>Modo Práctica</h2>
         <div class="menu-options">
-            <button id="practice-1v1-button" class="menu-button">Individual (1 vs IA)</button>
-            <button id="practice-2v2-button" class="menu-button">Parejas (Tú + IA vs IA + IA)</button>
+            <button id="practice-1v1-button" class="menu-button">Individual</button>
+            <button id="practice-2v2-button" class="menu-button">En Parejas</button>
             <button id="back-to-main-menu-from-submenu-button" class="menu-button secondary-button">Volver al Menú</button>
         </div>
     </div>
@@ -28,7 +28,9 @@
             <h1>Dominó Cubano Doble 9</h1>
             <nav id="game-options">
                 <button id="start-round-button">Iniciar Nueva Ronda</button>
-                <button id="contraste-button">Modo Contraste</button>
+                <button id="contraste-toggle-button" aria-label="Cambiar modo de contraste">
+                    <span id="contraste-icon-container">☀️</span> <!-- Icono de sol por defecto -->
+                </button>
                 <button id="toggle-vista-fichas-button">Ver Puntos</button>
                 <button id="toggle-ayuda-fichas-button">Desactivar Ayuda Fichas</button>
                 <button id="new-game-button">Nueva Partida</button>
