@@ -10,6 +10,7 @@ const practice2v2Button = document.getElementById('practice-2v2-button');
 const backToMainMenuButton = document.getElementById('back-to-main-menu-from-submenu-button');
 const backToMenuButton = document.getElementById('back-to-menu-button');
 const startRoundButton = document.getElementById('start-round-button');
+const toggleVistaFichasButton = document.getElementById('toggle-vista-fichas-button');
 
 // Game elements
 const dominoTable = document.getElementById('domino-table');
@@ -26,6 +27,48 @@ let players = [];
 let dominoPieces = [];
 let tableEnds = { left: null, right: null };
 let gameStarted = false;
+let showNumbers = false; // Por defecto muestra puntos
+
+// Función para crear los puntos del dominó
+function createDots(number) {
+    const dotsContainer = document.createElement('div');
+    dotsContainer.className = 'dots-container';
+    
+    // Configuración de patrones de puntos para cada número
+    const dotPatterns = {
+        0: [],
+        1: [{top: '50%', left: '50%'}],
+        2: [{top: '25%', left: '25%'}, {top: '75%', left: '75%'}],
+        3: [{top: '25%', left: '25%'}, {top: '50%', left: '50%'}, {top: '75%', left: '75%'}],
+        4: [{top: '25%', left: '25%'}, {top: '25%', left: '75%'}, 
+            {top: '75%', left: '25%'}, {top: '75%', left: '75%'}],
+        5: [{top: '25%', left: '25%'}, {top: '25%', left: '75%'}, 
+            {top: '50%', left: '50%'},
+            {top: '75%', left: '25%'}, {top: '75%', left: '75%'}],
+        6: [{top: '25%', left: '25%'}, {top: '25%', left: '75%'},
+            {top: '50%', left: '25%'}, {top: '50%', left: '75%'},
+            {top: '75%', left: '25%'}, {top: '75%', left: '75%'}],
+        7: [{top: '25%', left: '25%'}, {top: '25%', left: '75%'},
+            {top: '50%', left: '25%'}, {top: '50%', left: '50%'}, {top: '50%', left: '75%'},
+            {top: '75%', left: '25%'}, {top: '75%', left: '75%'}],
+        8: [{top: '25%', left: '25%'}, {top: '25%', left: '50%'}, {top: '25%', left: '75%'},
+            {top: '50%', left: '25%'}, {top: '50%', left: '75%'},
+            {top: '75%', left: '25%'}, {top: '75%', left: '50%'}, {top: '75%', left: '75%'}],
+        9: [{top: '25%', left: '25%'}, {top: '25%', left: '50%'}, {top: '25%', left: '75%'},
+            {top: '50%', left: '25%'}, {top: '50%', left: '50%'}, {top: '50%', left: '75%'},
+            {top: '75%', left: '25%'}, {top: '75%', left: '50%'}, {top: '75%', left: '75%'}]
+    };
+
+    dotPatterns[number].forEach(position => {
+        const dot = document.createElement('div');
+        dot.className = 'dot';
+        dot.style.top = position.top;
+        dot.style.left = position.left;
+        dotsContainer.appendChild(dot);
+    });
+
+    return dotsContainer;
+}
 
 // Create all domino pieces (double 9)
 function createDominoPieces() {
@@ -67,22 +110,28 @@ function dealPieces() {
 function createDominoPiece(piece, index, isPlayable = false) {
     const div = document.createElement('div');
     div.className = `ficha-domino${isPlayable ? ' ficha-jugable' : ''}`;
-    div.style.width = '60px';
-    div.style.height = '120px';
-    div.style.margin = '5px';
-    div.style.display = 'inline-block';
-    div.style.position = 'relative';
-    div.style.cursor = isPlayable ? 'pointer' : 'default';
     
-    // Add numbers
-    div.innerHTML = `
-        <div style="height: 50%; border-bottom: 2px solid black; display: flex; justify-content: center; align-items: center;">
-            ${piece.left}
-        </div>
-        <div style="height: 50%; display: flex; justify-content: center; align-items: center;">
-            ${piece.right}
-        </div>
-    `;
+    // Crear las mitades de la ficha
+    const topHalf = document.createElement('div');
+    topHalf.className = 'ficha-mitad top';
+    const bottomHalf = document.createElement('div');
+    bottomHalf.className = 'ficha-mitad bottom';
+
+    if (piece.left === '?' && piece.right === '?') {
+        // Ficha oculta (para los oponentes)
+        div.className += ' ficha-oculta';
+    } else {
+        if (showNumbers) {
+            topHalf.textContent = piece.left;
+            bottomHalf.textContent = piece.right;
+        } else {
+            topHalf.appendChild(createDots(piece.left));
+            bottomHalf.appendChild(createDots(piece.right));
+        }
+    }
+
+    div.appendChild(topHalf);
+    div.appendChild(bottomHalf);
     
     if (isPlayable) {
         div.onclick = () => playPiece(index);
@@ -163,7 +212,18 @@ function updateGameDisplay() {
     
     // Display table ends
     if (tableEnds.left !== null) {
-        dominoTable.textContent = `Mesa: ${tableEnds.left} - ${tableEnds.right}`;
+        const tableInfo = document.createElement('div');
+        tableInfo.className = 'table-info';
+        if (showNumbers) {
+            tableInfo.textContent = `Mesa: ${tableEnds.left} - ${tableEnds.right}`;
+        } else {
+            tableInfo.appendChild(createDots(tableEnds.left));
+            const separator = document.createElement('span');
+            separator.textContent = ' - ';
+            tableInfo.appendChild(separator);
+            tableInfo.appendChild(createDots(tableEnds.right));
+        }
+        dominoTable.appendChild(tableInfo);
     }
     
     // Display player pieces
@@ -237,6 +297,15 @@ backToMenuButton.addEventListener('click', () => {
 startRoundButton.addEventListener('click', () => {
     if (gameStarted) {
         initializeGame(gameMode);
+    }
+});
+
+// Toggle vista fichas (números/puntos)
+toggleVistaFichasButton.addEventListener('click', () => {
+    showNumbers = !showNumbers;
+    toggleVistaFichasButton.textContent = showNumbers ? 'Ver Puntos' : 'Ver Números';
+    if (gameStarted) {
+        updateGameDisplay();
     }
 });
 
