@@ -16,6 +16,8 @@
     --ficha-borde: #000000;
     --dot-color: #000000;
     --ficha-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --ficha-width: clamp(40px, 8vw, 60px);
+    --ficha-height: calc(var(--ficha-width) * 2);
 }
 
 /* --- Estilos Base y Contenedor Principal --- */
@@ -28,12 +30,12 @@ body {
     flex-direction: column;
     align-items: center;
     min-height: 100vh;
-    padding-top: 10px;
+    padding: 10px;
     transition: background-color var(--transition-speed), color var(--transition-speed);
 }
 
 #app-container {
-    width: 98%;
+    width: 100%;
     max-width: 1400px;
     background: var(--card-bg);
     box-shadow: 0 10px 30px var(--shadow-color);
@@ -54,7 +56,7 @@ header {
 
 header h1 {
     margin: 0;
-    font-size: 1.5em;
+    font-size: clamp(1.2em, 4vw, 1.8em);
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
@@ -68,7 +70,8 @@ header h1 {
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 2rem;
-    min-width: 300px;
+    width: 90%;
+    max-width: 400px;
     z-index: 1000;
 }
 
@@ -94,29 +97,13 @@ header h1 {
     width: 100%;
     margin: 0.5rem 0;
     cursor: pointer;
-}
-
-.menu-button:hover {
-    background: #388E3C;
-}
-
-.menu-button:disabled {
-    background: #cccccc;
-    cursor: not-allowed;
-}
-
-.secondary-button {
-    background: #6c757d;
-}
-
-.secondary-button:hover {
-    background: #495057;
+    font-size: clamp(14px, 3vw, 16px);
 }
 
 /* --- Fichas de Dominó --- */
 .ficha-domino {
-    width: 60px;
-    height: 120px;
+    width: var(--ficha-width);
+    height: var(--ficha-height);
     background: var(--ficha-color);
     border: 2px solid var(--ficha-borde);
     border-radius: 8px;
@@ -135,74 +122,127 @@ header h1 {
     justify-content: center;
     align-items: center;
     position: relative;
-    font-size: 24px;
+    font-size: clamp(16px, 3vw, 24px);
     font-weight: bold;
 }
 
-.ficha-mitad.top {
-    border-bottom: 2px solid var(--ficha-borde);
-}
-
-.dots-container {
-    width: 100%;
-    height: 100%;
-    position: relative;
-}
-
 .dot {
-    width: 8px;
-    height: 8px;
+    width: clamp(6px, 1.5vw, 8px);
+    height: clamp(6px, 1.5vw, 8px);
     background-color: var(--dot-color);
     border-radius: 50%;
     position: absolute;
     transform: translate(-50%, -50%);
 }
 
-.ficha-oculta {
-    background: linear-gradient(45deg, #2c3e50, #34495e);
-    cursor: default;
-}
-
-.ficha-oculta .ficha-mitad {
-    background: repeating-linear-gradient(
-        45deg,
-        rgba(255, 255, 255, 0.1),
-        rgba(255, 255, 255, 0.1) 10px,
-        transparent 10px,
-        transparent 20px
-    );
-}
-
 /* --- Mesa de Juego --- */
+#game-area {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+}
+
+#middle-area {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    margin: 10px 0;
+}
+
 #domino-table {
     background: #27ae60;
     border-radius: var(--border-radius);
-    min-height: 200px;
-    margin: 20px;
-    padding: 20px;
+    min-height: 150px;
+    margin: 10px;
+    padding: 10px;
     text-align: center;
+    overflow-x: auto;
 }
 
 /* --- Manos de Jugadores --- */
 .player-hand {
     background: rgba(255,255,255,0.9);
     border-radius: var(--border-radius);
-    padding: 10px;
-    margin: 10px;
+    padding: 5px;
+    margin: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .horizontal-hand {
     flex-direction: row;
-    height: 140px;
+    height: calc(var(--ficha-height) + 20px);
+    width: 100%;
 }
 
 .vertical-hand {
     flex-direction: column;
-    width: 80px;
-    height: 400px;
+    width: calc(var(--ficha-width) + 20px);
+    height: 300px;
+}
+
+/* --- Botones de Control --- */
+#game-options {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+    padding: 5px;
+}
+
+#game-options button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    background: var(--primary-color);
+    color: white;
+    cursor: pointer;
+    font-size: clamp(12px, 2.5vw, 14px);
+    white-space: nowrap;
+}
+
+/* --- Media Queries --- */
+@media (max-width: 600px) {
+    #game-options {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #game-options button {
+        width: 100%;
+        margin: 2px 0;
+    }
+
+    .vertical-hand {
+        height: 250px;
+    }
+}
+
+@media (min-width: 768px) {
+    :root {
+        --ficha-width: 50px;
+    }
+
+    #game-area {
+        padding: 1rem;
+    }
+
+    .vertical-hand {
+        height: 350px;
+    }
+}
+
+@media (min-width: 1024px) {
+    :root {
+        --ficha-width: 60px;
+    }
+
+    .vertical-hand {
+        height: 400px;
+    }
 }
 
 /* --- Modo Contraste Alto --- */
@@ -226,60 +266,4 @@ body.contraste-alto .ficha-oculta {
 
 body.contraste-alto #domino-table {
     background: #1e824c;
-}
-
-/* --- Área de Juego --- */
-#game-area {
-    display: flex;
-    padding: 1rem;
-}
-
-#middle-area {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 20px 0;
-    flex-grow: 1;
-}
-
-/* --- Botones de Control --- */
-#game-options {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    padding: 10px;
-}
-
-#game-options button {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    background: var(--primary-color);
-    color: white;
-    cursor: pointer;
-    transition: background-color var(--transition-speed);
-}
-
-#game-options button:hover {
-    background: #388E3C;
-}
-
-/* --- Media Queries --- */
-@media (min-width: 600px) {
-    #game-area {
-        flex-direction: row;
-    }
-}
-
-@media (min-width: 992px) {
-    header h1 {
-        font-size: 1.8em;
-    }
-}
-
-@media (min-width: 1200px) {
-    #game-board {
-        width: 85%;
-    }
 }
