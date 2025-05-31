@@ -9,6 +9,199 @@ const practice1v1Button = document.getElementById('practice-1v1-button');
 const practice2v2Button = document.getElementById('practice-2v2-button');
 const backToMainMenuButton = document.getElementById('back-to-main-menu-from-submenu-button');
 const backToMenuButton = document.getElementById('back-to-menu-button');
+const startRoundButton = document.getElementById('start-round-button');
+
+// Game elements
+const dominoTable = document.getElementById('domino-table');
+const playerHandBottom = document.getElementById('player-hand-bottom');
+const playerHandTop = document.getElementById('player-hand-top');
+const playerHandLeft = document.getElementById('player-hand-left');
+const playerHandRight = document.getElementById('player-hand-right');
+const gameMessages = document.getElementById('game-messages');
+
+// Game state
+let gameMode = null;
+let currentPlayer = 0;
+let players = [];
+let dominoPieces = [];
+let tableEnds = { left: null, right: null };
+let gameStarted = false;
+
+// Create all domino pieces (double 9)
+function createDominoPieces() {
+    dominoPieces = [];
+    for (let i = 0; i <= 9; i++) {
+        for (let j = i; j <= 9; j++) {
+            dominoPieces.push({ left: i, right: j });
+        }
+    }
+}
+
+// Shuffle array using Fisher-Yates algorithm
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
+// Deal pieces to players
+function dealPieces() {
+    const numPlayers = gameMode === '1v1' ? 2 : 4;
+    const piecesPerPlayer = 10;
+    players = Array(numPlayers).fill().map(() => []);
+    
+    shuffle(dominoPieces);
+    
+    for (let i = 0; i < piecesPerPlayer; i++) {
+        for (let j = 0; j < numPlayers; j++) {
+            if (dominoPieces.length > 0) {
+                players[j].push(dominoPieces.pop());
+            }
+        }
+    }
+}
+
+// Create visual representation of a domino piece
+function createDominoPiece(piece, index, isPlayable = false) {
+    const div = document.createElement('div');
+    div.className = `ficha-domino${isPlayable ? ' ficha-jugable' : ''}`;
+    div.style.width = '60px';
+    div.style.height = '120px';
+    div.style.margin = '5px';
+    div.style.display = 'inline-block';
+    div.style.position = 'relative';
+    div.style.cursor = isPlayable ? 'pointer' : 'default';
+    
+    // Add numbers
+    div.innerHTML = `
+        <div style="height: 50%; border-bottom: 2px solid black; display: flex; justify-content: center; align-items: center;">
+            ${piece.left}
+        </div>
+        <div style="height: 50%; display: flex; justify-content: center; align-items: center;">
+            ${piece.right}
+        </div>
+    `;
+    
+    if (isPlayable) {
+        div.onclick = () => playPiece(index);
+    }
+    
+    return div;
+}
+
+// Check if a piece can be played
+function canPlayPiece(piece) {
+    if (tableEnds.left === null) return true;
+    return piece.left === tableEnds.left || 
+           piece.right === tableEnds.left ||
+           piece.left === tableEnds.right || 
+           piece.right === tableEnds.right;
+}
+
+// Play a piece
+function playPiece(index) {
+    const piece = players[currentPlayer][index];
+    if (!canPlayPiece(piece)) return;
+    
+    players[currentPlayer].splice(index, 1);
+    
+    if (tableEnds.left === null) {
+        tableEnds.left = piece.left;
+        tableEnds.right = piece.right;
+    } else {
+        // Add piece to appropriate end
+        if (piece.left === tableEnds.left) {
+            tableEnds.left = piece.right;
+        } else if (piece.right === tableEnds.left) {
+            tableEnds.left = piece.left;
+        } else if (piece.left === tableEnds.right) {
+            tableEnds.right = piece.right;
+        } else if (piece.right === tableEnds.right) {
+            tableEnds.right = piece.left;
+        }
+    }
+    
+    updateGameDisplay();
+    nextTurn();
+}
+
+// Bot play logic
+function botPlay() {
+    const botPieces = players[currentPlayer];
+    const playableIndex = botPieces.findIndex(piece => canPlayPiece(piece));
+    
+    if (playableIndex !== -1) {
+        setTimeout(() => {
+            playPiece(playableIndex);
+        }, 1000);
+    } else {
+        setTimeout(() => {
+            gameMessages.textContent = `Jugador ${currentPlayer + 1} pasa`;
+            nextTurn();
+        }, 1000);
+    }
+}
+
+// Move to next turn
+function nextTurn() {
+    currentPlayer = (currentPlayer + 1) % players.length;
+    if (currentPlayer !== 0) {
+        botPlay();
+    }
+}
+
+// Update game display
+function updateGameDisplay() {
+    // Clear all hands
+    playerHandBottom.innerHTML = '';
+    playerHandTop.innerHTML = '';
+    playerHandLeft.innerHTML = '';
+    playerHandRight.innerHTML = '';
+    dominoTable.innerHTML = '';
+    
+    // Display table ends
+    if (tableEnds.left !== null) {
+        dominoTable.textContent = `Mesa: ${tableEnds.left} - ${tableEnds.right}`;
+    }
+    
+    // Display player pieces
+    players[0].forEach((piece, index) => {
+        playerHandBottom.appendChild(
+            createDominoPiece(piece, index, canPlayPiece(piece))
+        );
+    });
+    
+    // Display bot pieces (face down)
+    const hiddenPiece = { left: '?', right: '?' };
+    if (gameMode === '1v1') {
+        players[1].forEach(() => {
+            playerHandTop.appendChild(createDominoPiece(hiddenPiece, -1));
+        });
+    } else {
+        players[1].forEach(() => {
+            playerHandLeft.appendChild(createDominoPiece(hiddenPiece, -1));
+        });
+        players[2].forEach(() => {
+            playerHandTop.appendChild(createDominoPiece(hiddenPiece, -1));
+        });
+        players[3].forEach(() => {
+            playerHandRight.appendChild(createDominoPiece(hiddenPiece, -1));
+        });
+    }
+}
+
+// Initialize game
+function initializeGame(mode) {
+    gameMode = mode;
+    gameStarted = true;
+    createDominoPieces();
+    dealPieces();
+    currentPlayer = 0;
+    tableEnds = { left: null, right: null };
+    updateGameDisplay();
+}
 
 // Menu navigation
 practiceButton.addEventListener('click', () => {
@@ -25,18 +218,26 @@ backToMainMenuButton.addEventListener('click', () => {
 practice1v1Button.addEventListener('click', () => {
     subMenuPractica.style.display = 'none';
     appContainer.style.display = 'block';
-    // Aquí inicializaremos el juego en modo 1v1
+    initializeGame('1v1');
 });
 
 practice2v2Button.addEventListener('click', () => {
     subMenuPractica.style.display = 'none';
     appContainer.style.display = 'block';
-    // Aquí inicializaremos el juego en modo 2v2
+    initializeGame('2v2');
 });
 
 backToMenuButton.addEventListener('click', () => {
     appContainer.style.display = 'none';
     mainMenu.style.display = 'block';
+    gameStarted = false;
+});
+
+// Start new round
+startRoundButton.addEventListener('click', () => {
+    if (gameStarted) {
+        initializeGame(gameMode);
+    }
 });
 
 // Contraste toggle functionality
