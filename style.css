@@ -41,11 +41,11 @@ body {
     transform-style: preserve-3d;
     transition: transform 0.5s ease-out;
     animation: floatContainer 6s ease-in-out infinite;
-    display: none; /* Oculto por defecto */
+    display: none;
 }
 
 #app-container.visible {
-    display: block; /* Se muestra cuando tiene la clase visible */
+    display: block;
 }
 
 @keyframes floatContainer {
@@ -76,7 +76,7 @@ header h1 {
 }
 
 /* --- Menús --- */
-#main-menu, #sub-menu-practica {
+#main-menu {
     background: rgba(255,255,255,0.9);
     backdrop-filter: blur(10px);
     border-radius: var(--border-radius);
@@ -89,14 +89,32 @@ header h1 {
     transform: translate(-50%, -50%);
     padding: 2rem;
     min-width: 300px;
-    display: none; /* Ocultos por defecto */
+    display: block; /* Mostrar por defecto */
     z-index: 1000;
 }
 
-#main-menu.visible, #sub-menu-practica.visible {
-    display: flex; /* Se muestran cuando tienen la clase visible */
+#sub-menu-practica {
+    background: rgba(255,255,255,0.9);
+    backdrop-filter: blur(10px);
+    border-radius: var(--border-radius);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    transform-style: preserve-3d;
+    animation: menuFloat 5s ease-in-out infinite;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 2rem;
+    min-width: 300px;
+    display: none;
+    z-index: 1000;
+}
+
+.menu-options {
+    display: flex;
     flex-direction: column;
-    align-items: center;
+    gap: 1rem;
+    width: 100%;
 }
 
 @keyframes menuFloat {
@@ -117,6 +135,7 @@ header h1 {
     overflow: hidden;
     width: 100%;
     margin: 0.5rem 0;
+    cursor: pointer;
 }
 
 .menu-button:hover {
@@ -132,6 +151,10 @@ header h1 {
     background: linear-gradient(145deg, #cccccc, #999999);
     cursor: not-allowed;
     transform: none;
+}
+
+.secondary-button {
+    background: linear-gradient(145deg, #6c757d, #495057);
 }
 
 /* --- Botones con Efecto 3D --- */
@@ -232,15 +255,17 @@ header h1 {
     transform-style: preserve-3d;
     animation: zoomIn 0.3s ease-out;
     display: none;
-}
-
-#zoom-popup.visible {
-    display: block;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2000;
+    padding: 2rem;
 }
 
 @keyframes zoomIn {
-    from { transform: scale(0.8) translateY(50px); opacity: 0; }
-    to { transform: scale(1) translateY(0); opacity: 1; }
+    from { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
 }
 
 /* --- Modo Contraste Alto Adaptado --- */
