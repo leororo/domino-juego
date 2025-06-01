@@ -2,15 +2,22 @@
 const mainMenu = document.getElementById('main-menu');
 const subMenuPractica = document.getElementById('sub-menu-practica');
 const appContainer = document.getElementById('app-container');
+const settingsPanel = document.getElementById('settings-panel');
 
-// Buttons
+// Buttons and controls
 const practiceButton = document.getElementById('practice-button');
 const practice1v1Button = document.getElementById('practice-1v1-button');
 const practice2v2Button = document.getElementById('practice-2v2-button');
 const backToMainMenuButton = document.getElementById('back-to-main-menu-from-submenu-button');
 const backToMenuButton = document.getElementById('back-to-menu-button');
 const startRoundButton = document.getElementById('start-round-button');
-const toggleVistaFichasButton = document.getElementById('toggle-vista-fichas-button');
+const settingsButton = document.getElementById('settings-button');
+const closeSettingsButton = document.getElementById('close-settings-button');
+
+// Settings controls
+const showNumbersCheckbox = document.getElementById('show-numbers-checkbox');
+const highContrastCheckbox = document.getElementById('high-contrast-checkbox');
+const helpEnabledCheckbox = document.getElementById('help-enabled-checkbox');
 
 // Game elements
 const dominoTable = document.getElementById('domino-table');
@@ -28,10 +35,37 @@ let dominoPieces = [];
 let tablePieces = [];
 let tableEnds = { left: null, right: null };
 let gameStarted = false;
-let showNumbers = false; // Por defecto muestra puntos
-let tableGrid = []; // Matriz para controlar la posición de las fichas
-let centerPos = { row: 15, col: 15 }; // Posición central de la mesa
+let showNumbers = false;
+let tableGrid = [];
+let centerPos = { row: 15, col: 15 };
 let currentBranch = { direction: 'vertical', row: centerPos.row, col: centerPos.col };
+
+// Settings event listeners
+settingsButton.addEventListener('click', () => {
+    settingsPanel.classList.add('active');
+});
+
+closeSettingsButton.addEventListener('click', () => {
+    settingsPanel.classList.remove('active');
+});
+
+showNumbersCheckbox.addEventListener('change', (e) => {
+    showNumbers = e.target.checked;
+    if (gameStarted) {
+        updateGameDisplay();
+    }
+});
+
+highContrastCheckbox.addEventListener('change', (e) => {
+    document.body.classList.toggle('contraste-alto', e.target.checked);
+});
+
+helpEnabledCheckbox.addEventListener('change', (e) => {
+    // La lógica de ayuda se mantiene pero ahora se controla desde el panel de ajustes
+    if (gameStarted) {
+        updateGameDisplay();
+    }
+});
 
 // Función para crear los puntos del dominó
 function createDots(number) {
@@ -73,6 +107,32 @@ function createDots(number) {
     return dotsContainer;
 }
 
+function isDouble(piece) {
+    return piece.left === piece.right;
+}
+
+function getNextPosition(currentPos, direction) {
+    const pos = { ...currentPos };
+    switch (direction) {
+        case 'vertical':
+            pos.row += 1;
+            break;
+        case 'horizontal':
+            pos.col += 1;
+            break;
+    }
+    return pos;
+}
+
+function shouldChangeBranchDirection(pos) {
+    const margin = 3;
+    return pos.col <= margin || pos.col >= 30 - margin || pos.row <= margin || pos.row >= 30 - margin;
+}
+
+function getNewBranchDirection(currentDirection) {
+    return currentDirection === 'vertical' ? 'horizontal' : 'vertical';
+}
+
 // Create all domino pieces (double 9)
 function createDominoPieces() {
     dominoPieces = [];
@@ -109,37 +169,10 @@ function dealPieces() {
     }
 }
 
-function isDouble(piece) {
-    return piece.left === piece.right;
-}
-
-function getNextPosition(currentPos, direction) {
-    const pos = { ...currentPos };
-    switch (direction) {
-        case 'vertical':
-            pos.row += 1;
-            break;
-        case 'horizontal':
-            pos.col += 1;
-            break;
-    }
-    return pos;
-}
-
-function shouldChangeBranchDirection(pos) {
-    // Cambiar dirección cuando se acerca a los bordes o hay otra ficha cerca
-    const margin = 3;
-    return pos.col <= margin || pos.col >= 30 - margin || pos.row <= margin || pos.row >= 30 - margin;
-}
-
-function getNewBranchDirection(currentDirection) {
-    return currentDirection === 'vertical' ? 'horizontal' : 'vertical';
-}
-
 // Create visual representation of a domino piece
 function createDominoPiece(piece, index, isPlayable = false) {
     const div = document.createElement('div');
-    div.className = `ficha-domino${isPlayable ? ' ficha-jugable' : ''}`;
+    div.className = `ficha-domino${isPlayable && helpEnabledCheckbox.checked ? ' ficha-jugable' : ''}`;
     
     const topHalf = document.createElement('div');
     topHalf.className = 'ficha-mitad top';
@@ -185,11 +218,9 @@ function playPiece(index) {
     const playedPiece = players[currentPlayer].splice(index, 1)[0];
     
     if (tableEnds.left === null) {
-        // Primera ficha
         tableEnds.left = playedPiece.left;
         tableEnds.right = playedPiece.right;
         
-        // Si es doble, colocar vertical
         const initialDirection = isDouble(playedPiece) ? 'vertical' : 'horizontal';
         tablePieces.push({ 
             piece: playedPiece,
@@ -204,7 +235,6 @@ function playPiece(index) {
             col: centerPos.col
         };
     } else {
-        // Determinar la posición y orientación de la nueva ficha
         let newPos = getNextPosition(currentBranch, currentBranch.direction);
         
         if (shouldChangeBranchDirection(newPos)) {
@@ -212,11 +242,9 @@ function playPiece(index) {
             newPos = getNextPosition(currentBranch, currentBranch.direction);
         }
         
-        // Actualizar la posición actual de la rama
         currentBranch.row = newPos.row;
         currentBranch.col = newPos.col;
         
-        // Determinar si la ficha debe rotarse
         const isVertical = currentBranch.direction === 'vertical';
         const pieceIsDouble = isDouble(playedPiece);
         
@@ -227,7 +255,6 @@ function playPiece(index) {
             isDouble: pieceIsDouble
         });
         
-        // Actualizar los extremos del juego
         if (playedPiece.left === tableEnds.left) {
             tableEnds.left = playedPiece.right;
         } else if (playedPiece.right === tableEnds.left) {
@@ -276,11 +303,10 @@ function updateGameDisplay() {
     playerHandRight.innerHTML = '';
     dominoTable.innerHTML = '';
     
-    // Display table pieces
     const tableContainer = document.createElement('div');
     tableContainer.className = 'table-pieces';
     
-    tablePieces.forEach((tablePiece, index) => {
+    tablePieces.forEach((tablePiece) => {
         const pieceElement = createDominoPiece(tablePiece.piece, -1);
         pieceElement.className += ` ficha-${tablePiece.direction}`;
         pieceElement.style.gridRow = tablePiece.position.row;
@@ -295,14 +321,12 @@ function updateGameDisplay() {
     
     dominoTable.appendChild(tableContainer);
     
-    // Display player pieces
     players[0].forEach((piece, index) => {
         playerHandBottom.appendChild(
             createDominoPiece(piece, index, canPlayPiece(piece))
         );
     });
     
-    // Display bot pieces (face down)
     const hiddenPiece = { left: '?', right: '?' };
     if (gameMode === '1v1') {
         players[1].forEach(() => {
@@ -368,24 +392,7 @@ backToMenuButton.addEventListener('click', () => {
 // Start new round
 startRoundButton.addEventListener('click', () => {
     if (gameStarted) {
+        
         initializeGame(gameMode);
     }
-});
-
-// Toggle vista fichas (números/puntos)
-toggleVistaFichasButton.addEventListener('click', () => {
-    showNumbers = !showNumbers;
-    toggleVistaFichasButton.textContent = showNumbers ? 'Ver Puntos' : 'Ver Números';
-    if (gameStarted) {
-        updateGameDisplay();
-    }
-});
-
-// Contraste toggle functionality
-const contrasteToggleButton = document.getElementById('contraste-toggle-button');
-const contrasteIconContainer = document.getElementById('contraste-icon-container');
-
-contrasteToggleButton.addEventListener('click', () => {
-    document.body.classList.toggle('contraste-alto');
-    contrasteIconContainer.textContent = document.body.classList.contains('contraste-alto') ? '🌙' : '☀️';
 });

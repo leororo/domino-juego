@@ -15,7 +15,7 @@
             <button id="friends-button" class="menu-button" disabled>Con Amigos (Próximamente)</button>
         </div>
     </div>
-    <div id="sub-menu-practica" class="hidden"> <!-- Inicia oculto -->
+    <div id="sub-menu-practica" class="hidden">
         <h2>Modo Práctica</h2>
         <div class="menu-options">
             <button id="practice-1v1-button" class="menu-button">Individual</button>
@@ -28,11 +28,7 @@
             <h1>Dominó Cubano Doble 9</h1>
             <nav id="game-options">
                 <button id="start-round-button">Iniciar Nueva Ronda</button>
-                <button id="contraste-toggle-button" aria-label="Cambiar modo de contraste">
-                    <span id="contraste-icon-container">☀️</span> <!-- Icono de sol por defecto -->
-                </button>
-                <button id="toggle-vista-fichas-button">Ver Puntos</button>
-                <button id="toggle-ayuda-fichas-button">Desactivar Ayuda Fichas</button>
+                <button id="settings-button">Ajustes</button>
                 <button id="new-game-button">Nueva Partida</button>
                 <button id="back-to-menu-button">Menú Principal</button>
             </nav>
@@ -41,43 +37,48 @@
         <div id="game-area">
             <aside id="scoreboard">
                 <h2>Puntuación</h2>
-                <!-- Contenido del marcador -->
             </aside>
 
             <main id="game-board">
-                <!-- Representación visual del tablero de dominó -->
-                <section id="player-hand-top" class="player-hand horizontal-hand">
-                    <!-- Mano del jugador de arriba -->
-                </section>
+                <section id="player-hand-top" class="player-hand horizontal-hand"></section>
                 <div id="middle-area">
-                    <section id="player-hand-left" class="player-hand vertical-hand">
-                        <!-- Mano del jugador de la izquierda -->
-                    </section>
-                    <div id="domino-table">
-                        <!-- Fichas jugadas en la mesa -->
-                    </div>
-                    <section id="player-hand-right" class="player-hand vertical-hand">
-                        <!-- Mano del jugador de la derecha -->
-                    </section>
+                    <section id="player-hand-left" class="player-hand vertical-hand"></section>
+                    <div id="domino-table"></div>
+                    <section id="player-hand-right" class="player-hand vertical-hand"></section>
                 </div>
-                <section id="player-hand-bottom" class="player-hand horizontal-hand">
-                    <!-- Mano del jugador principal (abajo) -->
-                </section>
+                <section id="player-hand-bottom" class="player-hand horizontal-hand"></section>
             </main>
         </div>
 
         <footer>
-            <div id="game-messages" aria-live="polite">
-                <!-- Mensajes y notificaciones del juego -->
-            </div>
+            <div id="game-messages" aria-live="polite"></div>
             <p>&copy; 2025 Juego de Dominó</p>
         </footer>
+    </div>
+
+    <div id="settings-panel">
+        <h3>Ajustes</h3>
+        <div class="settings-option">
+            <label>
+                <input type="checkbox" id="show-numbers-checkbox"> Mostrar Números
+            </label>
+        </div>
+        <div class="settings-option">
+            <label>
+                <input type="checkbox" id="high-contrast-checkbox"> Modo Alto Contraste
+            </label>
+        </div>
+        <div class="settings-option">
+            <label>
+                <input type="checkbox" id="help-enabled-checkbox" checked> Ayuda de Fichas
+            </label>
+        </div>
+        <button id="close-settings-button">Cerrar</button>
     </div>
 
     <div id="zoom-popup" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="zoom-popup-title">
         <div id="zoom-contenido">
             <h3 id="zoom-popup-title" style="position:absolute; left:-10000px; top:auto; width:1px; height:1px; overflow:hidden;">Ficha Ampliada</h3>
-            <!-- La ficha ampliada se insertará aquí -->
         </div>
         <button id="zoom-cerrar-button" aria-label="Cerrar zoom">&times;</button>
     </div>

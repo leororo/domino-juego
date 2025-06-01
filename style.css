@@ -16,8 +16,10 @@
     --ficha-borde: #000000;
     --dot-color: #000000;
     --ficha-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    --ficha-width: clamp(40px, 8vw, 60px);
-    --ficha-height: calc(var(--ficha-width) * 2);
+    --hand-ficha-width: clamp(40px, 8vw, 60px);
+    --hand-ficha-height: calc(var(--hand-ficha-width) * 2);
+    --table-ficha-width: calc(var(--hand-ficha-width) * 0.75);
+    --table-ficha-height: calc(var(--table-ficha-width) * 2);
 }
 
 /* --- Estilos Base y Contenedor Principal --- */
@@ -100,10 +102,34 @@ header h1 {
     font-size: clamp(14px, 3vw, 16px);
 }
 
+/* --- Panel de Ajustes --- */
+#settings-panel {
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 300px;
+    height: 100vh;
+    background: var(--card-bg);
+    box-shadow: -2px 0 10px var(--shadow-color);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    padding: 20px;
+}
+
+#settings-panel.active {
+    right: 0;
+}
+
+#settings-panel h3 {
+    margin-top: 0;
+}
+
+.settings-option {
+    margin: 15px 0;
+}
+
 /* --- Fichas de Dominó --- */
 .ficha-domino {
-    width: var(--ficha-width);
-    height: var(--ficha-height);
     background: var(--ficha-color);
     border: 2px solid var(--ficha-borde);
     border-radius: 8px;
@@ -115,6 +141,16 @@ header h1 {
     position: relative;
     cursor: pointer;
     transition: transform 0.2s ease;
+}
+
+.player-hand .ficha-domino {
+    width: var(--hand-ficha-width);
+    height: var(--hand-ficha-height);
+}
+
+#domino-table .ficha-domino {
+    width: var(--table-ficha-width);
+    height: var(--table-ficha-height);
 }
 
 .ficha-horizontal {
@@ -195,8 +231,8 @@ header h1 {
 
 .table-pieces {
     display: grid;
-    grid-template-columns: repeat(30, var(--ficha-width));
-    grid-template-rows: repeat(30, var(--ficha-height));
+    grid-template-columns: repeat(30, var(--table-ficha-width));
+    grid-template-rows: repeat(30, var(--table-ficha-height));
     gap: 2px;
     position: relative;
 }
@@ -216,13 +252,13 @@ header h1 {
 
 .horizontal-hand {
     flex-direction: row;
-    height: calc(var(--ficha-height) + 20px);
+    height: calc(var(--hand-ficha-height) + 20px);
     width: 100%;
 }
 
 .vertical-hand {
     flex-direction: column;
-    width: calc(var(--ficha-width) + 20px);
+    width: calc(var(--hand-ficha-width) + 20px);
     height: 300px;
 }
 
@@ -265,11 +301,16 @@ header h1 {
     #domino-table {
         min-height: 200px;
     }
+
+    #settings-panel {
+        width: 100%;
+        right: -100%;
+    }
 }
 
 @media (min-width: 768px) {
     :root {
-        --ficha-width: 50px;
+        --hand-ficha-width: 50px;
     }
 
     #game-area {
@@ -283,7 +324,7 @@ header h1 {
 
 @media (min-width: 1024px) {
     :root {
-        --ficha-width: 60px;
+        --hand-ficha-width: 60px;
     }
 
     .vertical-hand {
