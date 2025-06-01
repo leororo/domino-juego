@@ -25,6 +25,7 @@ let gameMode = null;
 let currentPlayer = 0;
 let players = [];
 let dominoPieces = [];
+let tablePieces = [];
 let tableEnds = { left: null, right: null };
 let gameStarted = false;
 let showNumbers = false; // Por defecto muestra puntos
@@ -154,21 +155,27 @@ function playPiece(index) {
     const piece = players[currentPlayer][index];
     if (!canPlayPiece(piece)) return;
     
-    players[currentPlayer].splice(index, 1);
+    const playedPiece = players[currentPlayer].splice(index, 1)[0];
     
     if (tableEnds.left === null) {
-        tableEnds.left = piece.left;
-        tableEnds.right = piece.right;
+        // Primera ficha
+        tableEnds.left = playedPiece.left;
+        tableEnds.right = playedPiece.right;
+        tablePieces.push({ piece: playedPiece, position: 'center' });
     } else {
-        // Add piece to appropriate end
-        if (piece.left === tableEnds.left) {
-            tableEnds.left = piece.right;
-        } else if (piece.right === tableEnds.left) {
-            tableEnds.left = piece.left;
-        } else if (piece.left === tableEnds.right) {
-            tableEnds.right = piece.right;
-        } else if (piece.right === tableEnds.right) {
-            tableEnds.right = piece.left;
+        // Determinar dónde y cómo colocar la ficha
+        if (playedPiece.left === tableEnds.left) {
+            tableEnds.left = playedPiece.right;
+            tablePieces.unshift({ piece: playedPiece, position: 'left', flipped: true });
+        } else if (playedPiece.right === tableEnds.left) {
+            tableEnds.left = playedPiece.left;
+            tablePieces.unshift({ piece: playedPiece, position: 'left' });
+        } else if (playedPiece.left === tableEnds.right) {
+            tableEnds.right = playedPiece.right;
+            tablePieces.push({ piece: playedPiece, position: 'right' });
+        } else if (playedPiece.right === tableEnds.right) {
+            tableEnds.right = playedPiece.left;
+            tablePieces.push({ piece: playedPiece, position: 'right', flipped: true });
         }
     }
     
@@ -210,21 +217,19 @@ function updateGameDisplay() {
     playerHandRight.innerHTML = '';
     dominoTable.innerHTML = '';
     
-    // Display table ends
-    if (tableEnds.left !== null) {
-        const tableInfo = document.createElement('div');
-        tableInfo.className = 'table-info';
-        if (showNumbers) {
-            tableInfo.textContent = `Mesa: ${tableEnds.left} - ${tableEnds.right}`;
-        } else {
-            tableInfo.appendChild(createDots(tableEnds.left));
-            const separator = document.createElement('span');
-            separator.textContent = ' - ';
-            tableInfo.appendChild(separator);
-            tableInfo.appendChild(createDots(tableEnds.right));
+    // Display table pieces
+    const tableContainer = document.createElement('div');
+    tableContainer.className = 'table-pieces';
+    
+    tablePieces.forEach(({ piece, position, flipped }) => {
+        const pieceElement = createDominoPiece(piece, -1);
+        if (flipped) {
+            pieceElement.style.transform = 'rotate(180deg)';
         }
-        dominoTable.appendChild(tableInfo);
-    }
+        tableContainer.appendChild(pieceElement);
+    });
+    
+    dominoTable.appendChild(tableContainer);
     
     // Display player pieces
     players[0].forEach((piece, index) => {
@@ -260,6 +265,7 @@ function initializeGame(mode) {
     dealPieces();
     currentPlayer = 0;
     tableEnds = { left: null, right: null };
+    tablePieces = [];
     updateGameDisplay();
 }
 
