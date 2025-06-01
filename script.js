@@ -29,8 +29,9 @@ let tablePieces = [];
 let tableEnds = { left: null, right: null };
 let gameStarted = false;
 let showNumbers = false; // Por defecto muestra puntos
-let currentDirection = 'horizontal'; // Dirección actual de las fichas
-let currentRow = 0; // Fila actual para el patrón serpiente
+let tableGrid = []; // Matriz para controlar la posición de las fichas
+let centerPos = { row: 15, col: 15 }; // Posición central de la mesa
+let currentBranch = { direction: 'vertical', row: centerPos.row, col: centerPos.col };
 
 // Función para crear los puntos del dominó
 function createDots(number) {
@@ -108,6 +109,33 @@ function dealPieces() {
     }
 }
 
+function isDouble(piece) {
+    return piece.left === piece.right;
+}
+
+function getNextPosition(currentPos, direction) {
+    const pos = { ...currentPos };
+    switch (direction) {
+        case 'vertical':
+            pos.row += 1;
+            break;
+        case 'horizontal':
+            pos.col += 1;
+            break;
+    }
+    return pos;
+}
+
+function shouldChangeBranchDirection(pos) {
+    // Cambiar dirección cuando se acerca a los bordes o hay otra ficha cerca
+    const margin = 3;
+    return pos.col <= margin || pos.col >= 30 - margin || pos.row <= margin || pos.row >= 30 - margin;
+}
+
+function getNewBranchDirection(currentDirection) {
+    return currentDirection === 'vertical' ? 'horizontal' : 'vertical';
+}
+
 // Create visual representation of a domino piece
 function createDominoPiece(piece, index, isPlayable = false) {
     const div = document.createElement('div');
@@ -160,62 +188,54 @@ function playPiece(index) {
         // Primera ficha
         tableEnds.left = playedPiece.left;
         tableEnds.right = playedPiece.right;
-        tablePieces.push({ 
-            piece: playedPiece, 
-            position: 'center',
-            direction: 'horizontal'
-        });
-        currentDirection = 'horizontal';
-        currentRow = 0;
-    } else {
-        const tableWidth = dominoTable.clientWidth;
-        const pieceWidth = 70; // Ancho aproximado de una ficha
-        const maxPiecesPerRow = Math.floor(tableWidth / pieceWidth);
         
-        // Calcular si necesitamos cambiar de dirección
-        if (currentDirection === 'horizontal' && tablePieces.length % maxPiecesPerRow === 0) {
-            currentDirection = 'vertical';
-            currentRow++;
-        } else if (currentDirection === 'vertical' && tablePieces.length % 2 === 0) {
-            currentDirection = 'horizontal';
-            currentRow++;
+        // Si es doble, colocar vertical
+        const initialDirection = isDouble(playedPiece) ? 'vertical' : 'horizontal';
+        tablePieces.push({ 
+            piece: playedPiece,
+            position: { row: centerPos.row, col: centerPos.col },
+            direction: initialDirection,
+            isDouble: isDouble(playedPiece)
+        });
+        
+        currentBranch = {
+            direction: initialDirection,
+            row: centerPos.row,
+            col: centerPos.col
+        };
+    } else {
+        // Determinar la posición y orientación de la nueva ficha
+        let newPos = getNextPosition(currentBranch, currentBranch.direction);
+        
+        if (shouldChangeBranchDirection(newPos)) {
+            currentBranch.direction = getNewBranchDirection(currentBranch.direction);
+            newPos = getNextPosition(currentBranch, currentBranch.direction);
         }
-
-        // Determinar dónde y cómo colocar la ficha
+        
+        // Actualizar la posición actual de la rama
+        currentBranch.row = newPos.row;
+        currentBranch.col = newPos.col;
+        
+        // Determinar si la ficha debe rotarse
+        const isVertical = currentBranch.direction === 'vertical';
+        const pieceIsDouble = isDouble(playedPiece);
+        
+        tablePieces.push({
+            piece: playedPiece,
+            position: newPos,
+            direction: pieceIsDouble ? (isVertical ? 'horizontal' : 'vertical') : currentBranch.direction,
+            isDouble: pieceIsDouble
+        });
+        
+        // Actualizar los extremos del juego
         if (playedPiece.left === tableEnds.left) {
             tableEnds.left = playedPiece.right;
-            tablePieces.unshift({ 
-                piece: playedPiece, 
-                position: 'left', 
-                flipped: true,
-                direction: currentDirection,
-                row: currentRow
-            });
         } else if (playedPiece.right === tableEnds.left) {
             tableEnds.left = playedPiece.left;
-            tablePieces.unshift({ 
-                piece: playedPiece, 
-                position: 'left',
-                direction: currentDirection,
-                row: currentRow
-            });
         } else if (playedPiece.left === tableEnds.right) {
             tableEnds.right = playedPiece.right;
-            tablePieces.push({ 
-                piece: playedPiece, 
-                position: 'right',
-                direction: currentDirection,
-                row: currentRow
-            });
         } else if (playedPiece.right === tableEnds.right) {
             tableEnds.right = playedPiece.left;
-            tablePieces.push({ 
-                piece: playedPiece, 
-                position: 'right', 
-                flipped: true,
-                direction: currentDirection,
-                row: currentRow
-            });
         }
     }
     
@@ -260,32 +280,19 @@ function updateGameDisplay() {
     const tableContainer = document.createElement('div');
     tableContainer.className = 'table-pieces';
     
-    let currentRowContainer = document.createElement('div');
-    currentRowContainer.className = 'table-row';
-    let lastRow = 0;
-    
     tablePieces.forEach((tablePiece, index) => {
-        if (tablePiece.row !== lastRow) {
-            tableContainer.appendChild(currentRowContainer);
-            currentRowContainer = document.createElement('div');
-            currentRowContainer.className = 'table-row';
-            lastRow = tablePiece.row;
-        }
-        
         const pieceElement = createDominoPiece(tablePiece.piece, -1);
         pieceElement.className += ` ficha-${tablePiece.direction}`;
+        pieceElement.style.gridRow = tablePiece.position.row;
+        pieceElement.style.gridColumn = tablePiece.position.col;
         
-        if (tablePiece.flipped) {
-            pieceElement.style.transform = tablePiece.direction === 'horizontal' ? 
-                'rotate(180deg)' : 'rotate(90deg)';
-        } else if (tablePiece.direction === 'vertical') {
-            pieceElement.style.transform = 'rotate(-90deg)';
+        if (tablePiece.isDouble && tablePiece.direction === 'vertical') {
+            pieceElement.style.transform = 'rotate(90deg)';
         }
         
-        currentRowContainer.appendChild(pieceElement);
+        tableContainer.appendChild(pieceElement);
     });
     
-    tableContainer.appendChild(currentRowContainer);
     dominoTable.appendChild(tableContainer);
     
     // Display player pieces
@@ -323,8 +330,8 @@ function initializeGame(mode) {
     currentPlayer = 0;
     tableEnds = { left: null, right: null };
     tablePieces = [];
-    currentDirection = 'horizontal';
-    currentRow = 0;
+    tableGrid = Array(30).fill().map(() => Array(30).fill(null));
+    currentBranch = { direction: 'vertical', row: centerPos.row, col: centerPos.col };
     updateGameDisplay();
 }
 

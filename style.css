@@ -114,7 +114,7 @@ header h1 {
     box-shadow: var(--ficha-shadow);
     position: relative;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease;
 }
 
 .ficha-horizontal {
@@ -123,7 +123,6 @@ header h1 {
 
 .ficha-vertical {
     transform-origin: center;
-    margin: 35px 5px;
 }
 
 .ficha-mitad {
@@ -165,7 +164,7 @@ header h1 {
 }
 
 .ficha-jugable:hover {
-    transform: translateY(-5px);
+    transform: scale(1.05);
 }
 
 /* --- Mesa de Juego --- */
@@ -189,23 +188,17 @@ header h1 {
     margin: 10px;
     padding: 20px;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
     overflow: auto;
 }
 
 .table-pieces {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    min-width: min-content;
-}
-
-.table-row {
-    display: flex;
-    flex-direction: row;
-    gap: 5px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(30, var(--ficha-width));
+    grid-template-rows: repeat(30, var(--ficha-height));
+    gap: 2px;
+    position: relative;
 }
 
 /* --- Manos de Jugadores --- */
