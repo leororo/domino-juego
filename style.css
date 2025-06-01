@@ -18,12 +18,12 @@
     --ficha-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     
     /* Tamaños base para móvil */
-    --hand-ficha-width: clamp(30px, 7vw, 45px);
+    --hand-ficha-width: clamp(20px, 5vw, 35px);
     --hand-ficha-height: calc(var(--hand-ficha-width) * 2);
-    --table-ficha-width: calc(var(--hand-ficha-width) * 0.75);
+    --table-ficha-width: calc(var(--hand-ficha-width) * 0.6);
     --table-ficha-height: calc(var(--table-ficha-width) * 2);
-    --dot-size: clamp(4px, 1.2vw, 6px);
-    --spacing-unit: clamp(4px, 1vw, 8px);
+    --dot-size: clamp(3px, 0.8vw, 5px);
+    --spacing-unit: clamp(2px, 0.8vw, 6px);
 }
 
 /* --- Estilos Base y Contenedor Principal --- */
@@ -55,15 +55,39 @@ body {
 header {
     background: linear-gradient(45deg, #2c3e50, #3498db);
     color: white;
-    padding: calc(var(--spacing-unit) * 2);
+    padding: calc(var(--spacing-unit) * 1.5);
     text-align: center;
     position: relative;
 }
 
 header h1 {
     margin: 0;
-    font-size: clamp(1rem, 5vw, 1.5rem);
+    font-size: clamp(0.875rem, 4vw, 1.25rem);
     text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+/* --- Botones de Iconos --- */
+.icon-button {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: calc(var(--spacing-unit) * 1.5);
+    cursor: pointer;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+
+.icon-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.icon-button i {
+    font-size: 1.2rem;
 }
 
 /* --- Menús --- */
@@ -134,12 +158,19 @@ header h1 {
     margin: calc(var(--spacing-unit) * 2) 0;
 }
 
+#close-settings-button {
+    position: absolute;
+    top: var(--spacing-unit);
+    right: var(--spacing-unit);
+    color: var(--text-color);
+}
+
 /* --- Fichas de Dominó --- */
 .ficha-domino {
     background: var(--ficha-color);
-    border: 2px solid var(--ficha-borde);
-    border-radius: calc(var(--spacing-unit));
-    margin: calc(var(--spacing-unit) / 2);
+    border: 1px solid var(--ficha-borde);
+    border-radius: calc(var(--spacing-unit) / 2);
+    margin: calc(var(--spacing-unit) / 4);
     display: inline-flex;
     flex-direction: column;
     overflow: hidden;
@@ -174,12 +205,12 @@ header h1 {
     justify-content: center;
     align-items: center;
     position: relative;
-    font-size: clamp(0.75rem, 2.5vw, 1rem);
+    font-size: clamp(0.625rem, 2vw, 0.875rem);
     font-weight: bold;
 }
 
 .top {
-    border-bottom: 2px solid var(--ficha-borde);
+    border-bottom: 1px solid var(--ficha-borde);
 }
 
 .dots-container {
@@ -215,7 +246,7 @@ header h1 {
     display: flex;
     flex-direction: column;
     padding: var(--spacing-unit);
-    height: calc(100vh - 150px);
+    height: calc(100vh - 120px);
 }
 
 #middle-area {
@@ -242,10 +273,10 @@ header h1 {
     display: grid;
     grid-template-columns: repeat(30, var(--table-ficha-width));
     grid-template-rows: repeat(30, var(--table-ficha-height));
-    gap: 2px;
+    gap: 1px;
     position: relative;
     transform-origin: center;
-    transform: scale(0.9);
+    transform: scale(0.85);
 }
 
 /* --- Manos de Jugadores --- */
@@ -263,54 +294,22 @@ header h1 {
 
 .horizontal-hand {
     flex-direction: row;
-    height: calc(var(--hand-ficha-height) + var(--spacing-unit) * 4);
+    height: calc(var(--hand-ficha-height) + var(--spacing-unit) * 3);
     width: 100%;
-    min-height: calc(var(--hand-ficha-height) + var(--spacing-unit) * 4);
+    min-height: calc(var(--hand-ficha-height) + var(--spacing-unit) * 3);
 }
 
 .vertical-hand {
     flex-direction: column;
-    width: calc(var(--hand-ficha-width) + var(--spacing-unit) * 4);
+    width: calc(var(--hand-ficha-width) + var(--spacing-unit) * 3);
     height: 100%;
-    min-width: calc(var(--hand-ficha-width) + var(--spacing-unit) * 4);
-}
-
-/* --- Botones de Control --- */
-#game-options {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing-unit);
-    padding: var(--spacing-unit);
-}
-
-#game-options button {
-    padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 2);
-    border: none;
-    border-radius: 4px;
-    background: var(--primary-color);
-    color: white;
-    cursor: pointer;
-    font-size: clamp(0.75rem, 2.5vw, 0.875rem);
-    white-space: nowrap;
-    min-height: 44px;
-    min-width: 44px;
+    min-width: calc(var(--hand-ficha-width) + var(--spacing-unit) * 3);
 }
 
 /* --- Media Queries --- */
 @media (max-width: 480px) {
     :root {
-        --hand-ficha-width: clamp(25px, 6vw, 35px);
-    }
-
-    #game-options {
-        flex-direction: row;
-        flex-wrap: wrap;
-    }
-
-    #game-options button {
-        flex: 1;
-        min-width: calc(50% - var(--spacing-unit));
+        --hand-ficha-width: clamp(20px, 5vw, 30px);
     }
 
     .vertical-hand {
@@ -322,13 +321,13 @@ header h1 {
     }
 
     .table-pieces {
-        transform: scale(0.8);
+        transform: scale(0.75);
     }
 }
 
 @media (min-width: 768px) {
     :root {
-        --hand-ficha-width: clamp(35px, 7vw, 50px);
+        --hand-ficha-width: clamp(25px, 6vw, 40px);
     }
 
     #game-area {
@@ -336,17 +335,17 @@ header h1 {
     }
 
     .table-pieces {
-        transform: scale(0.95);
+        transform: scale(0.85);
     }
 }
 
 @media (min-width: 1024px) {
     :root {
-        --hand-ficha-width: clamp(40px, 8vw, 60px);
+        --hand-ficha-width: clamp(30px, 7vw, 50px);
     }
 
     .table-pieces {
-        transform: scale(1);
+        transform: scale(0.9);
     }
 }
 

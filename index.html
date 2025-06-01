@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dominó Cubano Doble 9</title>
+    <link rel="stylesheet" href="@fortawesome/fontawesome-free/css/all.min.css">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,10 +28,15 @@
         <header>
             <h1>Dominó Cubano Doble 9</h1>
             <nav id="game-options">
-                <button id="start-round-button">Iniciar Nueva Ronda</button>
-                <button id="settings-button">Ajustes</button>
-                <button id="new-game-button">Nueva Partida</button>
-                <button id="back-to-menu-button">Menú Principal</button>
+                <button id="start-round-button" class="icon-button" title="Nueva Ronda">
+                    <i class="fas fa-redo-alt"></i>
+                </button>
+                <button id="settings-button" class="icon-button" title="Ajustes">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button id="back-to-menu-button" class="icon-button" title="Menú Principal">
+                    <i class="fas fa-home"></i>
+                </button>
             </nav>
         </header>
 
@@ -73,7 +79,9 @@
                 <input type="checkbox" id="help-enabled-checkbox" checked> Ayuda de Fichas
             </label>
         </div>
-        <button id="close-settings-button">Cerrar</button>
+        <button id="close-settings-button" class="icon-button">
+            <i class="fas fa-times"></i>
+        </button>
     </div>
 
     <div id="zoom-popup" style="display: none;" role="dialog" aria-modal="true" aria-labelledby="zoom-popup-title">
