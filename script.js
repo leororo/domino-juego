@@ -29,13 +29,14 @@ let tablePieces = [];
 let tableEnds = { left: null, right: null };
 let gameStarted = false;
 let showNumbers = false; // Por defecto muestra puntos
+let currentDirection = 'horizontal'; // Dirección actual de las fichas
+let currentRow = 0; // Fila actual para el patrón serpiente
 
 // Función para crear los puntos del dominó
 function createDots(number) {
     const dotsContainer = document.createElement('div');
     dotsContainer.className = 'dots-container';
     
-    // Configuración de patrones de puntos para cada número
     const dotPatterns = {
         0: [],
         1: [{top: '50%', left: '50%'}],
@@ -112,14 +113,12 @@ function createDominoPiece(piece, index, isPlayable = false) {
     const div = document.createElement('div');
     div.className = `ficha-domino${isPlayable ? ' ficha-jugable' : ''}`;
     
-    // Crear las mitades de la ficha
     const topHalf = document.createElement('div');
     topHalf.className = 'ficha-mitad top';
     const bottomHalf = document.createElement('div');
     bottomHalf.className = 'ficha-mitad bottom';
 
     if (piece.left === '?' && piece.right === '?') {
-        // Ficha oculta (para los oponentes)
         div.className += ' ficha-oculta';
     } else {
         if (showNumbers) {
@@ -161,21 +160,62 @@ function playPiece(index) {
         // Primera ficha
         tableEnds.left = playedPiece.left;
         tableEnds.right = playedPiece.right;
-        tablePieces.push({ piece: playedPiece, position: 'center' });
+        tablePieces.push({ 
+            piece: playedPiece, 
+            position: 'center',
+            direction: 'horizontal'
+        });
+        currentDirection = 'horizontal';
+        currentRow = 0;
     } else {
+        const tableWidth = dominoTable.clientWidth;
+        const pieceWidth = 70; // Ancho aproximado de una ficha
+        const maxPiecesPerRow = Math.floor(tableWidth / pieceWidth);
+        
+        // Calcular si necesitamos cambiar de dirección
+        if (currentDirection === 'horizontal' && tablePieces.length % maxPiecesPerRow === 0) {
+            currentDirection = 'vertical';
+            currentRow++;
+        } else if (currentDirection === 'vertical' && tablePieces.length % 2 === 0) {
+            currentDirection = 'horizontal';
+            currentRow++;
+        }
+
         // Determinar dónde y cómo colocar la ficha
         if (playedPiece.left === tableEnds.left) {
             tableEnds.left = playedPiece.right;
-            tablePieces.unshift({ piece: playedPiece, position: 'left', flipped: true });
+            tablePieces.unshift({ 
+                piece: playedPiece, 
+                position: 'left', 
+                flipped: true,
+                direction: currentDirection,
+                row: currentRow
+            });
         } else if (playedPiece.right === tableEnds.left) {
             tableEnds.left = playedPiece.left;
-            tablePieces.unshift({ piece: playedPiece, position: 'left' });
+            tablePieces.unshift({ 
+                piece: playedPiece, 
+                position: 'left',
+                direction: currentDirection,
+                row: currentRow
+            });
         } else if (playedPiece.left === tableEnds.right) {
             tableEnds.right = playedPiece.right;
-            tablePieces.push({ piece: playedPiece, position: 'right' });
+            tablePieces.push({ 
+                piece: playedPiece, 
+                position: 'right',
+                direction: currentDirection,
+                row: currentRow
+            });
         } else if (playedPiece.right === tableEnds.right) {
             tableEnds.right = playedPiece.left;
-            tablePieces.push({ piece: playedPiece, position: 'right', flipped: true });
+            tablePieces.push({ 
+                piece: playedPiece, 
+                position: 'right', 
+                flipped: true,
+                direction: currentDirection,
+                row: currentRow
+            });
         }
     }
     
@@ -210,7 +250,6 @@ function nextTurn() {
 
 // Update game display
 function updateGameDisplay() {
-    // Clear all hands
     playerHandBottom.innerHTML = '';
     playerHandTop.innerHTML = '';
     playerHandLeft.innerHTML = '';
@@ -221,14 +260,32 @@ function updateGameDisplay() {
     const tableContainer = document.createElement('div');
     tableContainer.className = 'table-pieces';
     
-    tablePieces.forEach(({ piece, position, flipped }) => {
-        const pieceElement = createDominoPiece(piece, -1);
-        if (flipped) {
-            pieceElement.style.transform = 'rotate(180deg)';
+    let currentRowContainer = document.createElement('div');
+    currentRowContainer.className = 'table-row';
+    let lastRow = 0;
+    
+    tablePieces.forEach((tablePiece, index) => {
+        if (tablePiece.row !== lastRow) {
+            tableContainer.appendChild(currentRowContainer);
+            currentRowContainer = document.createElement('div');
+            currentRowContainer.className = 'table-row';
+            lastRow = tablePiece.row;
         }
-        tableContainer.appendChild(pieceElement);
+        
+        const pieceElement = createDominoPiece(tablePiece.piece, -1);
+        pieceElement.className += ` ficha-${tablePiece.direction}`;
+        
+        if (tablePiece.flipped) {
+            pieceElement.style.transform = tablePiece.direction === 'horizontal' ? 
+                'rotate(180deg)' : 'rotate(90deg)';
+        } else if (tablePiece.direction === 'vertical') {
+            pieceElement.style.transform = 'rotate(-90deg)';
+        }
+        
+        currentRowContainer.appendChild(pieceElement);
     });
     
+    tableContainer.appendChild(currentRowContainer);
     dominoTable.appendChild(tableContainer);
     
     // Display player pieces
@@ -266,6 +323,8 @@ function initializeGame(mode) {
     currentPlayer = 0;
     tableEnds = { left: null, right: null };
     tablePieces = [];
+    currentDirection = 'horizontal';
+    currentRow = 0;
     updateGameDisplay();
 }
 

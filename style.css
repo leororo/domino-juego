@@ -117,6 +117,15 @@ header h1 {
     transition: transform 0.3s ease;
 }
 
+.ficha-horizontal {
+    transform-origin: center;
+}
+
+.ficha-vertical {
+    transform-origin: center;
+    margin: 35px 5px;
+}
+
 .ficha-mitad {
     height: 50%;
     display: flex;
@@ -176,21 +185,27 @@ header h1 {
 #domino-table {
     background: #27ae60;
     border-radius: var(--border-radius);
-    min-height: 150px;
+    min-height: 300px;
     margin: 10px;
-    padding: 10px;
+    padding: 20px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    overflow-x: auto;
+    overflow: auto;
 }
 
 .table-pieces {
     display: flex;
-    flex-wrap: nowrap;
+    flex-direction: column;
+    gap: 10px;
+    min-width: min-content;
+}
+
+.table-row {
+    display: flex;
+    flex-direction: row;
     gap: 5px;
-    padding: 10px;
-    overflow-x: auto;
+    justify-content: center;
 }
 
 /* --- Manos de Jugadores --- */
@@ -252,6 +267,10 @@ header h1 {
 
     .vertical-hand {
         height: 250px;
+    }
+
+    #domino-table {
+        min-height: 200px;
     }
 }
 
