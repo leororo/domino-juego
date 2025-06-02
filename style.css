@@ -189,6 +189,9 @@ header h1 {
 #domino-table .ficha-domino {
     width: var(--table-ficha-width);
     height: var(--table-ficha-height);
+    margin: 0; /* Ensure no external margins affect grid placement */
+    justify-self: center; /* Center the piece horizontally within its grid cell */
+    align-self: center;   /* Center the piece vertically within its grid cell */
 }
 
 .ficha-horizontal {
