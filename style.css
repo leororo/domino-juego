@@ -1,0 +1,1110 @@
+/* 
+    Estilos para el Juego de Dominó Cubano Doble 9 
+    Autor: [Tu Nombre/Alias si lo deseas]
+    Fecha: 2024 (o fecha actual)
+    Descripción: Hoja de estilos principal para el juego de Dominó, 
+                 incluyendo responsividad y modo de alto contraste.
+*/
+
+/* --- Estilos Base y Contenedor Principal --- */
+body {
+    font-family: Arial, sans-serif; /* Fuente base para la aplicación */
+    margin: 0;
+    background-color: #f0f0f0;
+    color: #333; /* Color de texto base */
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    min-height: 100vh;
+    padding-top: 10px;
+    transition: background-color 0.3s, color 0.3s; /* Transición suave para cambios de tema */
+    box-sizing: border-box; /* Asegura que padding y borde no incrementen el tamaño total */
+}
+
+#app-container {
+    width: 98%;
+    max-width: 1400px; /* Ancho máximo para la aplicación */
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1); /* Sombra sutil */
+    border-radius: 8px; /* Bordes redondeados */
+    overflow: hidden; /* Contiene elementos hijos que podrían desbordarse */
+    border: 1px solid #ccc; 
+    transition: background-color 0.3s, border-color 0.3s;
+    display: flex; 
+    flex-direction: column; 
+}
+
+/* --- Cabecera del Juego --- */
+header {
+    background-color: #333;
+    color: white;
+    padding: 0.75rem;
+    text-align: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+header h1 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+/* Contenedor de opciones/botones en la cabecera del juego */
+#game-options {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los botones se ajusten en múltiples líneas */
+    justify-content: center; 
+    align-items: center;
+}
+
+#game-options button {
+    padding: 8px 12px;
+    margin: 5px;
+    background-color: #4CAF50; /* Verde estándar para botones de acción */
+    color: white;
+    border: 1px solid transparent; 
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+#game-options button:hover {
+    background-color: #45a049; /* Oscurece ligeramente en hover */
+}
+/* Estilo para el nuevo botón de contraste con icono */
+#contraste-toggle-button {
+    font-size: 1.2em; /* Ajusta el tamaño del icono si es necesario */
+    line-height: 1; /* Asegura que el span no añada altura extra */
+    padding: 6px 8px; /* Ajusta el padding para que sea similar a otros botones */
+    background-color: #6c757d; /* Un color gris neutro */
+    min-width: 40px; /* Asegura un ancho mínimo para el ícono */
+    text-align: center;
+}
+#contraste-toggle-button:hover {
+    background-color: #5a6268;
+}
+body.contraste-alto #contraste-toggle-button {
+    background-color: #555;
+    border-color: #fff;
+}
+body.contraste-alto #contraste-toggle-button:hover {
+    background-color: #777;
+}
+#contraste-icon-container {
+    display: inline-block; /* Para que el span se comporte como un bloque pero en línea */
+    vertical-align: middle;
+}
+
+
+/* --- Área Principal del Juego (Marcador y Tablero) --- */
+#game-area {
+    display: flex; 
+    flex-direction: column; /* Por defecto, marcador encima del tablero para móviles */
+    padding: 0.25rem; 
+    background-color: #e9e9e9; /* Fondo ligeramente gris para el área de juego */
+    transition: background-color 0.3s;
+    flex-grow: 1; /* Permite que el área de juego ocupe el espacio vertical disponible */
+    overflow: hidden; /* Evita que el contenedor de la aplicación se desborde */
+}
+
+/* --- Marcador de Puntuación --- */
+#scoreboard {
+    width: 100%; /* Ancho completo en pantallas pequeñas */
+    min-width: 0; 
+    padding: 0.25rem; 
+    border-right: none; 
+    border-bottom: 1px solid #ccc; /* Separador inferior en layout de columna */
+    background-color: #f9f9f9; /* Fondo muy claro para el marcador */
+    transition: background-color 0.3s, border-color 0.3s;
+    text-align: center; /* Centra el contenido del marcador en pantallas pequeñas */
+}
+
+#scoreboard h2 {
+    margin-top: 0.25rem; /* Espaciado reducido para pantallas pequeñas */
+    margin-bottom: 0.25rem;
+    font-size: 1.1em;
+}
+#scoreboard p {
+    margin: 0.2rem 0;
+    font-size: 0.85em;
+}
+
+/* --- Tablero de Juego Principal --- */
+#game-board {
+    width: 100%; 
+    padding: 0.25rem; 
+    display: flex;
+    flex-direction: column; 
+    flex-grow: 1; /* Permite que el tablero de juego crezca para ocupar espacio */
+    overflow: hidden; /* Evita problemas de desbordamiento interno */
+}
+
+/* --- Manos de los Jugadores --- */
+.player-hand {
+    border: 1px solid #ddd; /* Borde sutil para delimitar la mano */
+    padding: 0.1rem; 
+    margin-bottom: 0.25rem; 
+    min-height: 50px; /* Altura mínima para manos en pantallas pequeñas */
+    background-color: #fdfdfd; /* Fondo claro para las manos */
+    display: flex; 
+    flex-wrap: wrap; /* Permite que las fichas se envuelvan si no caben */
+    align-items: center; /* Centra las fichas verticalmente */
+    justify-content: center; /* Centra las fichas horizontalmente */
+    transition: background-color 0.3s, border-color 0.3s, border-width 0.1s ease-out, border-style 0.1s ease-out; /* Transición suave para cambios de tema y borde */
+    box-sizing: border-box; /* Asegura que el borde no aumente el tamaño visual */
+}
+
+/* Resaltado visual para el jugador activo */
+.turno-activo-visual {
+    border: 3px solid #007bff !important; /* Borde azul brillante. !important para asegurar precedencia si es necesario */
+    /* El padding se ajusta si el borde causa problemas de layout, 
+       pero box-sizing: border-box en .player-hand debería manejarlo.
+       Si no, se podría usar: padding: calc(0.1rem - 2px); 
+       (restando el exceso de borde al padding original)
+    */
+}
+body.contraste-alto .turno-activo-visual {
+    border-color: #FFD700 !important; /* Borde dorado/amarillo para alto contraste */
+}
+
+
+#player-hand-top {
+     min-height: 50px; /* Altura mínima para la mano superior */
+}
+
+/* Área central que contiene las manos laterales y la mesa */
+#middle-area {
+    display: flex;
+    flex-grow: 1; /* Crece para ocupar el espacio vertical disponible */
+    margin-bottom: 0.25rem; 
+    align-items: stretch; /* Estira las manos laterales verticalmente */
+    min-height: 150px; /* Altura mínima para el área media en pantallas pequeñas */
+}
+
+/* Manos laterales (izquierda y derecha) */
+#player-hand-left, #player-hand-right {
+    width: 50px; /* Ancho reducido para pantallas pequeñas */
+    min-height: 100px; /* Altura mínima reducida */
+    flex-direction: column; 
+    justify-content: flex-start; /* Alinea fichas al inicio */
+    align-items: center; /* Centra fichas si el espacio lo permite */
+    padding: 0.1rem; 
+    background-color: #f0f0f0; /* Fondo ligeramente diferente para distinguir */
+    border: 1px dashed #ccc; /* Borde discontinuo por defecto */
+    transition: background-color 0.3s, border-color 0.3s, border-width 0.1s ease-out, border-style 0.1s ease-out;
+    box-sizing: border-box;
+    overflow-y: auto; /* Permite scroll vertical si hay muchas fichas (ej. reveladas) */
+}
+
+/* --- Mesa de Dominó (donde se juegan las fichas) --- */
+#domino-table {
+    flex-grow: 1; /* Crece para ocupar el espacio central */
+    border: 2px dashed #aaa; /* Borde discontinuo para la mesa */
+    min-height: 100px; /* Altura mínima reducida para pantallas pequeñas */
+    background-color: #d0d0d0; /* Fondo gris para la mesa */
+    padding: 5px; 
+    display: flex;
+    flex-wrap: nowrap; /* Evita que la cadena de fichas se envuelva */
+    align-items: center; /* Centra las fichas verticalmente en la cadena */
+    justify-content: flex-start; /* Alinea las fichas jugadas al inicio de la cadena */
+    overflow-x: auto; /* Permite scroll horizontal para la cadena de fichas */
+    overflow-y: hidden; /* Evita scroll vertical innecesario */
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+#player-hand-bottom {
+    min-height: 55px; /* Altura mínima para la mano del jugador principal */
+}
+
+/* --- Estilos Interactivos para Fichas del Jugador Humano --- */
+/* Estilo base para fichas en la mano del jugador humano (para transiciones y z-index) */
+#player-hand-bottom .ficha-domino {
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out; 
+    position: relative; /* Necesario para que z-index funcione correctamente */
+}
+
+/* Resaltado para fichas jugables (si la ayuda está activa) */
+#player-hand-bottom .ficha-domino.ficha-jugable {
+    transform: translateY(-3px); /* Eleva ligeramente la ficha */
+    z-index: 5; /* Asegura que esté por encima de fichas no jugables */
+    box-shadow: 0 0 8px 2px rgba(50, 150, 50, 0.7); /* Sombra verde */
+    border: 1px solid rgba(50, 150, 50, 0.9); /* Borde verde */
+}
+body.contraste-alto #player-hand-bottom .ficha-domino.ficha-jugable {
+    box-shadow: 0 0 9px 3px #a8dba8; /* Sombra más clara en contraste alto */
+    border: 1px solid #a8dba8; /* Borde más claro */
+}
+
+/* Efecto hover general para fichas en la mano del jugador */
+#player-hand-bottom .ficha-domino:hover {
+    transform: scale(1.1) translateY(-2px); /* Agranda y eleva la ficha */
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.3); /* Sombra más pronunciada */
+    z-index: 10; /* Asegura que la ficha con hover esté por encima de otras */
+}
+
+/* Efecto hover específico para fichas jugables (combina y refina) */
+#player-hand-bottom .ficha-domino.ficha-jugable:hover {
+    transform: scale(1.1) translateY(-5px); /* Mayor elevación al hacer hover en jugables */
+    box-shadow: 0px 5px 15px rgba(50, 150, 50, 0.5); /* Sombra verde más pronunciada */
+    z-index: 15; /* Aún más arriba */
+}
+
+/* Estilo para el foco del teclado (aplicado a fichas en la mano del jugador humano) */
+#player-hand-bottom .ficha-domino:focus {
+    outline: 2px solid dodgerblue; /* Indicador de foco claro y estándar */
+    outline-offset: 1px; /* Pequeño espacio entre la ficha y el outline */
+    transform: scale(1.05) translateY(-2px); /* Similar al hover para consistencia */
+    box-shadow: 0px 3px 10px rgba(0, 100, 200, 0.4); /* Sombra azulada para el foco */
+    z-index: 12; /* Alto z-index para el foco */
+}
+/* Estilo de foco para fichas que también son jugables (si la ayuda está activa) */
+#player-hand-bottom .ficha-domino.ficha-jugable:focus {
+    outline-color: green; /* Foco verde si es jugable */
+    transform: scale(1.05) translateY(-5px); /* Mayor elevación */
+    box-shadow: 0px 4px 12px rgba(50, 150, 50, 0.6); /* Sombra verde más pronunciada */
+    z-index: 17; /* Máximo z-index para la ficha activa */
+}
+
+
+/* --- Pie de Página y Mensajes del Juego --- */
+footer {
+    background-color: #f8f8f8;
+    padding: 0.5rem; 
+    text-align: center;
+    border-top: 1px solid #ddd;
+    font-size: 0.8em; 
+    transition: background-color 0.3s, border-color 0.3s;
+}
+
+#game-messages {
+    margin-bottom: 0.25rem;
+    min-height: 16px; 
+    color: #333; 
+    font-style: italic;
+    font-size: 0.9em; 
+    transition: color 0.3s;
+}
+
+/* --- Estilos Generales para Fichas de Dominó --- */
+.ficha-domino {
+    border: 1px solid black;
+    background-color: white;
+    color: black; 
+    border-radius: 3px; 
+    font-size: 12px;  /* Tamaño de fuente base para números en fichas */  
+    font-weight: bold;
+    display: flex;      
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.2); /* Sombra sutil para dar profundidad */
+    margin: 1px; 
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s, opacity 0.2s ease-in-out, transform 0.2s ease-out, box-shadow 0.2s ease-out; 
+    box-sizing: border-box; 
+    flex-shrink: 0; /* Evita que las fichas se encojan en contenedores flex */
+}
+
+/* Mitad de una ficha, donde van los números o puntos */
+.mitad-ficha-canvas {
+    flex: 1; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%; 
+    height: 100%; 
+    overflow: hidden; /* Asegura que los puntos no se salgan */
+    position: relative; /* Para posicionamiento de puntos si es necesario */
+}
+
+/* --- Estilos Específicos de Fichas por Ubicación --- */
+
+/* Fichas en cualquier mano de jugador */
+.player-hand .ficha-domino {
+    width: 30px;  /* Ancho reducido para pantallas pequeñas */
+    height: 60px; /* Alto reducido para pantallas pequeñas */
+    flex-direction: column; /* Fichas verticales en mano por defecto */
+    cursor: pointer; /* Indica que son clickeables */
+}
+
+/* Fichas en manos laterales (izquierda/derecha) */
+#player-hand-left .ficha-domino, 
+#player-hand-right .ficha-domino {
+    /* Las fichas reveladas en manos laterales también son verticales */
+    width: 30px; 
+    height: 60px;
+}
+/* Dorso de fichas en manos laterales (se muestran horizontales) */
+#player-hand-left .ficha-domino.ficha-dorso, 
+#player-hand-right .ficha-domino.ficha-dorso {
+    width: 50px; /* Ancho del dorso ajustado al contenedor de la mano lateral */
+    height: 25px; /* Alto del dorso */
+}
+
+/* Fichas reveladas en la mano superior (oponente en 1v1 o compañero en 2v2) */
+#player-hand-top .ficha-domino:not(.ficha-dorso) {
+    opacity: 1; /* Asegura que sean visibles si se revelan */
+}
+
+/* Separador visual dentro de las fichas */
+.ficha-domino > span:not(.mitad-ficha-canvas) { 
+    display: block;
+    text-align: center;
+    padding: 0; 
+    line-height: 0; /* Compacta el separador */
+}
+
+/* Línea separadora para fichas verticales (en mano y dobles en tablero) */
+.player-hand .ficha-domino > span:nth-child(2):not(.mitad-ficha-canvas),
+.ficha-en-tablero.doble-en-tablero > span:nth-child(2):not(.mitad-ficha-canvas) {
+    border-top: 1px solid black;
+    border-bottom: 1px solid black;
+    width: 70%; /* Ancho de la línea */
+    height: 0; /* La línea se crea con los bordes */
+    margin: 1px auto; /* Centra la línea */
+    transition: border-color 0.3s;
+}
+
+/* Línea separadora para fichas horizontales (normales en tablero) */
+.ficha-en-tablero.normal-en-tablero > span:nth-child(2):not(.mitad-ficha-canvas) { 
+    border-left: 1px solid black;
+    border-right: 1px solid black;
+    height: 70%; /* Alto de la línea */
+    width: 0; /* La línea se crea con los bordes */
+    margin: auto 1px; /* Centra la línea */
+    transition: border-color 0.3s;
+}
+
+/* Fichas en el tablero */
+.ficha-en-tablero {
+    cursor: pointer; /* Para el zoom */
+    margin: 1px; 
+    opacity: 1 !important; /* Asegura visibilidad total */
+    flex-shrink: 0; /* No se encogen */
+}
+
+/* Fichas dobles en el tablero (verticales) */
+.ficha-en-tablero.doble-en-tablero {
+    width: 30px; 
+    min-width: 30px; 
+    height: 60px; 
+    min-height: 60px; 
+    flex-direction: column;
+}
+
+/* Fichas normales en el tablero (horizontales) */
+.ficha-en-tablero.normal-en-tablero {
+    width: 60px; 
+    min-width: 60px; 
+    height: 30px; 
+    min-height: 30px; 
+    flex-direction: row; 
+}
+
+/* --- Estilos para el Dorso de las Fichas --- */
+.ficha-dorso { 
+    width: 30px; /* Ancho por defecto para manos superior/inferior */
+    height: 60px; /* Alto por defecto para manos superior/inferior */
+    background-color: #555; /* Color oscuro para el dorso */
+    border: 1px solid #333;
+    color: #ccc; /* Color del texto (signo de interrogación) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2em; 
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+    opacity: 1; 
+}
+.ficha-dorso span { }
+/* Ya definido arriba para manos laterales, se mantiene por si acaso se usa en otro contexto */
+/* #player-hand-left .ficha-dorso, 
+#player-hand-right .ficha-dorso {
+     width: 50px; 
+     height: 25px;
+     font-size: 1em;
+} */
+
+
+/* === MODO CONTRASTE ALTO === */
+/* Modificaciones de color y borde para mejorar la visibilidad */
+body.contraste-alto {
+    background-color: black; /* Fondo negro */
+    color: white; /* Texto blanco general */
+}
+
+body.contraste-alto #app-container {
+    background-color: #111; /* Fondo de contenedor oscuro */
+    border-color: #555; /* Borde más visible */
+}
+
+body.contraste-alto header {
+    background-color: #000; 
+    color: #fff;
+}
+
+body.contraste-alto #game-options button {
+    background-color: #333; 
+    color: #fff;
+    border: 1px solid #fff; /* Botones con borde blanco */
+}
+body.contraste-alto #game-options button:hover {
+    background-color: #555;
+}
+/* Estilo para el nuevo botón de contraste con icono en modo contraste alto */
+body.contraste-alto #contraste-toggle-button {
+    background-color: #666; /* Un gris más claro para destacar sobre fondo negro */
+    border-color: #fff;
+}
+body.contraste-alto #contraste-toggle-button:hover {
+    background-color: #888;
+}
+
+
+body.contraste-alto #game-area {
+    background-color: #1a1a1a; 
+}
+
+body.contraste-alto #scoreboard {
+    background-color: #111;
+    border-bottom-color: #555; /* Borde inferior para el marcador en layout de columna */
+    border-right-color: transparent; /* Sin borde derecho en contraste si está en columna */
+}
+
+body.contraste-alto .player-hand {
+    background-color: #2a2a2a; /* Manos más oscuras */
+    border-color: #555;
+}
+
+body.contraste-alto #player-hand-left, 
+body.contraste-alto #player-hand-right {
+    background-color: #1c1c1c;
+    border-color: #444;
+}
+
+body.contraste-alto #domino-table {
+    background-color: #222; 
+    border-color: #666; /* Borde de mesa más visible */
+}
+
+body.contraste-alto footer {
+    background-color: #111;
+    border-top-color: #555;
+}
+
+body.contraste-alto #game-messages {
+    color: #eee; /* Mensajes más claros */
+}
+
+body.contraste-alto .ficha-domino {
+    background-color: #333; /* Fichas oscuras */
+    color: #fff;           /* Números/puntos blancos */
+    border-color: #fff; /* Borde blanco para fichas */
+    box-shadow: 1px 1px 3px rgba(255,255,255,0.2); /* Sombra clara */
+}
+
+/* Separador de ficha en contraste alto */
+body.contraste-alto .ficha-domino > span:nth-child(2):not(.mitad-ficha-canvas) {
+    border-color: #fff; /* Separador blanco */
+}
+
+/* Foco de teclado en contraste alto */
+body.contraste-alto #player-hand-bottom .ficha-domino:focus {
+    outline-color: yellow; /* Foco amarillo brillante */
+    box-shadow: 0px 0px 12px yellow;
+}
+body.contraste-alto #player-hand-bottom .ficha-domino.ficha-jugable:focus {
+    outline-color: lightgreen; /* Foco verde claro si es jugable */
+    box-shadow: 0px 0px 12px lightgreen;
+}
+
+
+body.contraste-alto .ficha-dorso {
+    background-color: #222; /* Dorso muy oscuro */
+    border-color: #777; /* Borde del dorso más claro */
+    color: #aaa; /* Texto del dorso más claro */
+}
+
+/* --- ESTILOS PARA EL POPUP DE ZOOM --- */
+#zoom-popup {
+    position: fixed; /* Superpuesto y fijo en la pantalla */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centrado perfecto */
+    background-color: white;
+    padding: 25px;
+    border: 3px solid #333;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4); /* Sombra para destacar */
+    z-index: 1000; /* Por encima de otros elementos */
+    display: none; /* Oculto por defecto */
+    flex-direction: column;
+    align-items: center;
+    border-radius: 8px;
+}
+
+#zoom-contenido {
+    display: flex; 
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.ficha-zoom { /* Estilo de la ficha dentro del popup */
+    border: 2px solid black;
+    background-color: ivory; /* Color marfil clásico para fichas */
+    border-radius: 6px;
+    font-weight: bold;
+    display: flex;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    color: black;
+}
+
+.ficha-zoom.vertical-zoom { /* Ficha doble ampliada */
+    width: 80px;  
+    height: 160px;
+    flex-direction: column;
+    font-size: 36px; /* Números grandes */
+}
+.ficha-zoom.vertical-zoom .mitad-ficha-canvas { 
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.ficha-zoom.vertical-zoom > span:nth-child(2):not(.mitad-ficha-canvas) { /* Separador */
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    height: 0;
+    width: 80%;
+    margin: 5px 0;
+    align-self: center;
+}
+
+.ficha-zoom.horizontal-zoom { /* Ficha normal ampliada */
+    width: 160px;
+    height: 80px;
+    flex-direction: row;
+    font-size: 36px;
+}
+.ficha-zoom.horizontal-zoom .mitad-ficha-canvas { 
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+.ficha-zoom.horizontal-zoom > span:nth-child(2):not(.mitad-ficha-canvas) { /* Separador */
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+    width: 0;
+    height: 80%;
+    margin: 0 5px;
+    align-self: center;
+}
+
+
+#zoom-cerrar-button {
+    padding: 10px 15px;
+    background-color: #e04040; /* Color rojo para cerrar */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+}
+#zoom-cerrar-button:hover {
+    background-color: #c03030; /* Rojo más oscuro en hover */
+}
+
+/* Zoom Popup en Modo Contraste Alto */
+body.contraste-alto #zoom-popup {
+    background-color: #222;
+    border-color: #888;
+    color: white; 
+}
+body.contraste-alto .ficha-zoom {
+    background-color: #444; 
+    color: #fff;          
+    border-color: #fff;    
+}
+body.contraste-alto .ficha-zoom.vertical-zoom > span:nth-child(2):not(.mitad-ficha-canvas) {
+    border-top-color: #fff;
+    border-bottom-color: #fff;
+}
+body.contraste-alto .ficha-zoom.horizontal-zoom > span:nth-child(2):not(.mitad-ficha-canvas) {
+    border-left-color: #fff;
+    border-right-color: #fff;
+}
+body.contraste-alto #zoom-cerrar-button {
+    background-color: #800000; 
+    color: #fff;
+    border: 1px solid #fff;
+}
+body.contraste-alto #zoom-cerrar-button:hover {
+    background-color: #a00000;
+}
+
+/* --- Estilos de Botones de Control del Juego --- */
+#new-game-button {
+    display: none; /* Oculto por defecto, se muestra vía JS */
+}
+
+#game-options #back-to-menu-button {
+    background-color: #f0ad4e; /* Naranja/ámbar para volver */
+}
+#game-options #back-to-menu-button:hover {
+    background-color: #ec971f;
+}
+body.contraste-alto #game-options #back-to-menu-button {
+    background-color: #5a3e00; 
+    border-color: #fff;
+    color: #fff;
+}
+body.contraste-alto #game-options #back-to-menu-button:hover {
+    background-color: #7a5e20;
+}
+
+#game-options #toggle-vista-fichas-button {
+    background-color: #5bc0de; /* Celeste/info para cambiar vista */
+}
+#game-options #toggle-vista-fichas-button:hover {
+    background-color: #31b0d5;
+}
+body.contraste-alto #game-options #toggle-vista-fichas-button {
+    background-color: #004c66; 
+    border-color: #fff; 
+    color: #fff;       
+}
+body.contraste-alto #game-options #toggle-vista-fichas-button:hover {
+    background-color: #006c86;
+}
+
+#game-options #toggle-ayuda-fichas-button {
+    background-color: #17a2b8; /* Otro tono de celeste/info */
+}
+#game-options #toggle-ayuda-fichas-button:hover {
+    background-color: #138496;
+}
+body.contraste-alto #game-options #toggle-ayuda-fichas-button {
+    background-color: #005668;
+    border-color: #fff; 
+    color: #fff;       
+}
+body.contraste-alto #game-options #toggle-ayuda-fichas-button:hover {
+    background-color: #006c86;
+}
+
+/* --- Estilos de Indicadores Visuales del Juego --- */
+/* Extremos jugables en el tablero (cuando se elige dónde poner ficha ambigua) */
+.extremo-jugable {
+    outline: 3px dashed #007bff; /* Outline azul para destacar */
+    outline-offset: 2px;
+    cursor: pointer;
+    opacity: 0.8; /* Ligera transparencia */
+}
+/* Estilo de foco para los extremos jugables en el tablero */
+.extremo-jugable:focus {
+    outline-style: solid; /* Cambia a sólido en foco para mayor claridad */
+    opacity: 1;
+}
+body.contraste-alto .extremo-jugable {
+    outline-color: #ffc107; /* Outline amarillo en contraste alto */
+}
+body.contraste-alto .extremo-jugable:focus {
+    outline-color: #fff2cc; /* Un amarillo más claro para el foco en contraste */
+}
+
+
+/* Animación para botones de llamada a la acción */
+@keyframes pulseAnimation {
+    0% { transform: scale(1); box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+    50% { transform: scale(1.05); box-shadow: 0 0 10px 5px rgba(76, 175, 80, 0.7); }
+    100% { transform: scale(1); box-shadow: 0 0 5px rgba(0,0,0,0.2); }
+}
+body.contraste-alto @keyframes pulseAnimation { /* Adaptación de la animación para contraste alto */
+    50% { box-shadow: 0 0 10px 5px rgba(168, 219, 168, 0.7); }
+}
+
+.call-to-action-button {
+    animation: pulseAnimation 1.5s infinite; /* Aplica la animación */
+    border: 2px solid #4CAF50 !important; 
+    font-weight: bold;
+}
+body.contraste-alto .call-to-action-button {
+    border-color: #a8dba8 !important; 
+}
+
+/* Estilo para fichas ganadoras en un "tranque" */
+.ficha-ganadora-tranque {
+    border: 2px solid gold !important; /* Borde dorado para destacar */
+    box-shadow: 0 0 10px gold; /* Sombra dorada */
+}
+body.contraste-alto .ficha-ganadora-tranque {
+    border-color: #FFD700 !important; 
+    box-shadow: 0 0 12px #FFD700;
+}
+
+
+/* --- ESTILOS PARA EL MENÚ PRINCIPAL Y SUBMENÚS --- */
+.hidden {
+    display: none !important; /* Clase utilidad para ocultar elementos */
+}
+
+/* Estilos comunes para contenedores de menú */
+#main-menu, #sub-menu-practica { 
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1; /* Asegura que los menús ocupen la mayor parte de la altura de la vista */
+    text-align: center;
+    padding: 20px;
+    width: 100%; /* Ocupa todo el ancho del contenedor padre (#app-container) */
+    box-sizing: border-box; /* El padding no aumenta el ancho total */
+}
+/* Oculta los menús cuando tienen la clase .hidden */
+#main-menu.hidden, #sub-menu-practica.hidden {
+    display: none !important;
+}
+
+/* Título del menú principal */
+#main-menu h1 {
+    font-size: 2em; /* Tamaño ajustado para pantallas pequeñas */
+    color: #333; 
+    margin-bottom: 30px; 
+}
+
+/* Contenedor de opciones de menú */
+.menu-options {
+    display: flex;
+    flex-direction: column; /* Botones apilados verticalmente */
+    gap: 10px; /* Espacio entre botones */
+    width: 100%;
+    max-width: 300px; /* Ancho máximo para los botones */
+}
+
+/* Botones de menú */
+.menu-button {
+    padding: 12px 20px; 
+    font-size: 1.1em; 
+    color: white;
+    background-color: #5cb85c; /* Verde para botones principales */
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    min-width: auto; /* Permite que los botones se ajusten a su contenido si es necesario */
+    width: 100%; /* Ocupan el ancho de .menu-options */
+}
+
+.menu-button:hover {
+    background-color: #4cae4c; /* Color hover */
+}
+
+/* Botones deshabilitados */
+.menu-button:disabled,
+.menu-button[disabled] { 
+    background-color: #cccccc; /* Color de fondo grisáceo */
+    color: #666666; /* Color de texto apagado */
+    cursor: not-allowed; /* Cursor de no permitido */
+}
+
+/* Menú en Modo Contraste Alto */
+body.contraste-alto #main-menu h1 {
+    color: #fff; /* Título blanco */
+}
+body.contraste-alto .menu-button {
+    background-color: #444; /* Fondo oscuro */
+    color: #fff; /* Texto blanco */
+    border: 1px solid #fff; /* Borde blanco */
+}
+body.contraste-alto .menu-button:hover {
+    background-color: #555; /* Fondo un poco más claro en hover */
+}
+body.contraste-alto .menu-button[disabled],
+body.contraste-alto .menu-button[disabled] { 
+    background-color: #222; /* Fondo muy oscuro para deshabilitados */
+    color: #555; /* Texto muy apagado */
+    border-color: #444; /* Borde oscuro */
+}
+
+/* Título del submenú */
+#sub-menu-practica h2 {
+    font-size: 1.8em; 
+    color: #333;
+    margin-bottom: 25px; 
+}
+#sub-menu-practica .menu-options {
+    gap: 15px; 
+}
+/* Botón secundario (ej. "Volver al Menú") */
+.secondary-button { 
+    background-color: #6c757d; /* Color gris */
+}
+.secondary-button:hover {
+    background-color: #5a6268; /* Gris más oscuro en hover */
+}
+/* Submenú en Modo Contraste Alto */
+body.contraste-alto #sub-menu-practica h2 {
+    color: #fff; /* Título blanco */
+}
+body.contraste-alto .secondary-button {
+    background-color: #343a40; /* Fondo oscuro para botón secundario */
+    border-color: #fff; /* Borde blanco */
+}
+body.contraste-alto .secondary-button:hover {
+    background-color: #495057; /* Un poco más claro en hover */
+}
+
+/* --- Otros Elementos de UI --- */
+
+/* Mensaje de jugador que pasa, resaltado */
+.mensaje-pase-resaltado {
+    background-color: #fff3cd; /* Fondo amarillo pálido */
+    color: #856404; /* Texto oscuro para legibilidad */
+    padding: 8px; 
+    border-radius: 4px;
+    transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+}
+body.contraste-alto .mensaje-pase-resaltado {
+    background-color: #5e5300; /* Fondo oscuro amarillento */
+    color: #fffde0; /* Texto claro */
+}
+
+/* --- Estilos para Fichas con Puntos (Vista de Puntos) --- */
+/* Contenedor de los puntos en una mitad de ficha */
+.puntos-layout {
+    width: 100%;
+    height: 100%;
+    display: grid; /* Usa CSS Grid para posicionar los puntos */
+    grid-template-columns: repeat(3, 1fr); /* Rejilla de 3x3 */
+    grid-template-rows: repeat(3, 1fr);
+    align-items: center; /* Centra los puntos en las celdas de la rejilla */
+    justify-items: center; /* Centra los puntos en las celdas de la rejilla */
+    box-sizing: border-box;
+    padding: 1px; 
+}
+
+/* Estilo de un punto individual */
+.punto-domino {
+    width: 4px; 
+    height: 4px; 
+    background-color: black;
+    border-radius: 50%; /* Hace que sea un círculo */
+}
+/* Punto en modo contraste alto */
+body.contraste-alto .punto-domino {
+    background-color: white; /* Puntos blancos */
+}
+
+/* Puntos en la ficha ampliada (zoom) */
+.ficha-zoom .puntos-layout {
+    padding: 5px; /* Mayor padding para la vista ampliada */
+}
+.ficha-zoom .punto-domino {
+    width: 10px; /* Puntos más grandes en el zoom */
+    height: 10px;
+}
+
+/* --- Definiciones de Patrones de Puntos (CSS Grid Areas) --- */
+/* Patrones para fichas en orientación vertical (por defecto) */
+.puntos-layout.valor-1 .punto-domino:nth-child(1) { grid-area: 2 / 2; } /* 1 punto: centro */
+.puntos-layout.valor-2 .punto-domino:nth-child(1) { grid-area: 1 / 1; } /* 2 puntos: esquinas opuestas */
+.puntos-layout.valor-2 .punto-domino:nth-child(2) { grid-area: 3 / 3; }
+.puntos-layout.valor-3 .punto-domino:nth-child(1) { grid-area: 1 / 1; }
+.puntos-layout.valor-3 .punto-domino:nth-child(2) { grid-area: 2 / 2; }
+.puntos-layout.valor-3 .punto-domino:nth-child(3) { grid-area: 3 / 3; }
+.puntos-layout.valor-4 .punto-domino:nth-child(1) { grid-area: 1 / 1; }
+.puntos-layout.valor-4 .punto-domino:nth-child(2) { grid-area: 1 / 3; }
+.puntos-layout.valor-4 .punto-domino:nth-child(3) { grid-area: 3 / 1; }
+.puntos-layout.valor-4 .punto-domino:nth-child(4) { grid-area: 3 / 3; }
+.puntos-layout.valor-5 .punto-domino:nth-child(1) { grid-area: 1 / 1; }
+.puntos-layout.valor-5 .punto-domino:nth-child(2) { grid-area: 1 / 3; }
+.puntos-layout.valor-5 .punto-domino:nth-child(3) { grid-area: 2 / 2; }
+.puntos-layout.valor-5 .punto-domino:nth-child(4) { grid-area: 3 / 1; }
+.puntos-layout.valor-5 .punto-domino:nth-child(5) { grid-area: 3 / 3; }
+.puntos-layout.valor-6 .punto-domino:nth-child(1) { grid-area: 1 / 1; }
+.puntos-layout.valor-6 .punto-domino:nth-child(2) { grid-area: 1 / 3; }
+.puntos-layout.valor-6 .punto-domino:nth-child(3) { grid-area: 2 / 1; }
+.puntos-layout.valor-6 .punto-domino:nth-child(4) { grid-area: 2 / 3; }
+.puntos-layout.valor-6 .punto-domino:nth-child(5) { grid-area: 3 / 1; }
+.puntos-layout.valor-6 .punto-domino:nth-child(6) { grid-area: 3 / 3; }
+.puntos-layout.valor-7 .punto-domino:nth-child(1) { grid-area: 1 / 1; }
+.puntos-layout.valor-7 .punto-domino:nth-child(2) { grid-area: 1 / 3; }
+.puntos-layout.valor-7 .punto-domino:nth-child(3) { grid-area: 2 / 1; }
+.puntos-layout.valor-7 .punto-domino:nth-child(4) { grid-area: 2 / 2; }
+.puntos-layout.valor-7 .punto-domino:nth-child(5) { grid-area: 2 / 3; }
+.puntos-layout.valor-7 .punto-domino:nth-child(6) { grid-area: 3 / 1; }
+.puntos-layout.valor-7 .punto-domino:nth-child(7) { grid-area: 3 / 3; }
+.puntos-layout.valor-8 .punto-domino:nth-child(1) { grid-area: 1 / 1; }
+.puntos-layout.valor-8 .punto-domino:nth-child(2) { grid-area: 1 / 2; }
+.puntos-layout.valor-8 .punto-domino:nth-child(3) { grid-area: 1 / 3; }
+.puntos-layout.valor-8 .punto-domino:nth-child(4) { grid-area: 2 / 1; }
+.puntos-layout.valor-8 .punto-domino:nth-child(5) { grid-area: 2 / 3; }
+.puntos-layout.valor-8 .punto-domino:nth-child(6) { grid-area: 3 / 1; }
+.puntos-layout.valor-8 .punto-domino:nth-child(7) { grid-area: 3 / 2; }
+.puntos-layout.valor-8 .punto-domino:nth-child(8) { grid-area: 3 / 3; }
+/* Valor-9 llena el grid 3x3 por defecto, no necesita reglas específicas si todos los hijos son .punto-domino */
+
+/* Patrones para fichas en orientación horizontal */
+.puntos-layout.horizontal.valor-1 .punto-domino:nth-child(1) { grid-area: 2 / 2; } 
+.puntos-layout.horizontal.valor-2 .punto-domino:nth-child(1) { grid-area: 1 / 1; } 
+.puntos-layout.horizontal.valor-2 .punto-domino:nth-child(2) { grid-area: 3 / 3; } 
+.puntos-layout.horizontal.valor-3 .punto-domino:nth-child(1) { grid-area: 1 / 1; } 
+.puntos-layout.horizontal.valor-3 .punto-domino:nth-child(2) { grid-area: 2 / 2; } 
+.puntos-layout.horizontal.valor-3 .punto-domino:nth-child(3) { grid-area: 3 / 3; } 
+.puntos-layout.horizontal.valor-4 .punto-domino:nth-child(1) { grid-area: 1 / 1; } 
+.puntos-layout.horizontal.valor-4 .punto-domino:nth-child(2) { grid-area: 1 / 3; }
+.puntos-layout.horizontal.valor-4 .punto-domino:nth-child(3) { grid-area: 3 / 1; }
+.puntos-layout.horizontal.valor-4 .punto-domino:nth-child(4) { grid-area: 3 / 3; }
+.puntos-layout.horizontal.valor-5 .punto-domino:nth-child(1) { grid-area: 1 / 1; } 
+.puntos-layout.horizontal.valor-5 .punto-domino:nth-child(2) { grid-area: 1 / 3; }
+.puntos-layout.horizontal.valor-5 .punto-domino:nth-child(3) { grid-area: 2 / 2; }
+.puntos-layout.horizontal.valor-5 .punto-domino:nth-child(4) { grid-area: 3 / 1; }
+.puntos-layout.horizontal.valor-5 .punto-domino:nth-child(5) { grid-area: 3 / 3; }
+.puntos-layout.horizontal.valor-6 .punto-domino:nth-child(1) { grid-area: 1 / 1; } 
+.puntos-layout.horizontal.valor-6 .punto-domino:nth-child(2) { grid-area: 1 / 2; }
+.puntos-layout.horizontal.valor-6 .punto-domino:nth-child(3) { grid-area: 1 / 3; }
+.puntos-layout.horizontal.valor-6 .punto-domino:nth-child(4) { grid-area: 3 / 1; }
+.puntos-layout.horizontal.valor-6 .punto-domino:nth-child(5) { grid-area: 3 / 2; }
+.puntos-layout.horizontal.valor-6 .punto-domino:nth-child(6) { grid-area: 3 / 3; }
+.puntos-layout.horizontal.valor-7 .punto-domino:nth-child(1) { grid-area: 1 / 1; } 
+.puntos-layout.horizontal.valor-7 .punto-domino:nth-child(2) { grid-area: 1 / 2; }
+.puntos-layout.horizontal.valor-7 .punto-domino:nth-child(3) { grid-area: 1 / 3; }
+.puntos-layout.horizontal.valor-7 .punto-domino:nth-child(4) { grid-area: 2 / 2; } 
+.puntos-layout.horizontal.valor-7 .punto-domino:nth-child(5) { grid-area: 3 / 1; }
+.puntos-layout.horizontal.valor-7 .punto-domino:nth-child(6) { grid-area: 3 / 2; }
+.puntos-layout.horizontal.valor-7 .punto-domino:nth-child(7) { grid-area: 3 / 3; }
+.puntos-layout.horizontal.valor-8 .punto-domino:nth-child(1) { grid-area: 1 / 1; } 
+.puntos-layout.horizontal.valor-8 .punto-domino:nth-child(2) { grid-area: 2 / 1; }
+.puntos-layout.horizontal.valor-8 .punto-domino:nth-child(3) { grid-area: 3 / 1; }
+.puntos-layout.horizontal.valor-8 .punto-domino:nth-child(4) { grid-area: 1 / 2; }
+.puntos-layout.horizontal.valor-8 .punto-domino:nth-child(5) { grid-area: 3 / 2; }
+.puntos-layout.horizontal.valor-8 .punto-domino:nth-child(6) { grid-area: 1 / 3; }
+.puntos-layout.horizontal.valor-8 .punto-domino:nth-child(7) { grid-area: 2 / 3; }
+.puntos-layout.horizontal.valor-8 .punto-domino:nth-child(8) { grid-area: 3 / 3; }
+
+.ficha-domino > .mitad-ficha-canvas + span:not(.mitad-ficha-canvas) {
+    /* Este selector parece que no tiene estilos asociados, podría eliminarse o usarse si es necesario */
+}
+
+
+/* === Media Queries para Responsividad === */
+
+/* Dispositivos medianos (tablets en vertical, móviles grandes en horizontal) 
+   Punto de quiebre: 600px o mayor */
+@media (min-width: 600px) {
+    /* Restaura el layout de dos columnas para el área de juego */
+    #game-area {
+        flex-direction: row; 
+    }
+    #scoreboard {
+        width: 25%; 
+        min-width: 150px; 
+        border-right: 1px solid #ccc; 
+        border-bottom: none; 
+        text-align: left; 
+    }
+     #scoreboard h2 {
+        font-size: 1.2em;
+    }
+    #scoreboard p {
+        font-size: 0.9em;
+    }
+    #game-board {
+        width: 75%; 
+    }
+    /* Ajusta el ancho de las manos laterales */
+    #player-hand-left, #player-hand-right {
+        width: 60px; 
+        min-height: 150px; 
+    }
+    #domino-table {
+        min-height: 180px; 
+    }
+    /* Restaura un tamaño de ficha intermedio */
+     .player-hand .ficha-domino { 
+        width: 32px;  
+        height: 64px; 
+        font-size: 13px;
+    }
+    .ficha-en-tablero.doble-en-tablero {
+        width: 32px; min-width: 32px; height: 64px; min-height: 64px;
+    }
+    .ficha-en-tablero.normal-en-tablero {
+        width: 64px; min-width: 64px; height: 32px; min-height: 32px;
+    }
+    #player-hand-left .ficha-dorso, 
+    #player-hand-right .ficha-dorso {
+         width: 56px; 
+         height: 28px;
+    }
+     .punto-domino { /* Puntos un poco más grandes */
+        width: 5px; 
+        height: 5px;
+    }
+    /* Ajustes de fuente para menús */
+    #main-menu h1 { font-size: 2.2em; }
+    #sub-menu-practica h2 { font-size: 2em; }
+    .menu-button { padding: 15px 25px; font-size: 1.15em; }
+}
+
+/* Dispositivos grandes (escritorios)
+   Punto de quiebre: 992px o mayor */
+@media (min-width: 992px) {
+    /* Restaura tamaños y espaciados originales para escritorio */
+    header h1 { font-size: 1.8em; } 
+    #game-options button { font-size: 0.9em; padding: 8px 12px;}
+     /* Estilo para el nuevo botón de contraste con icono en desktop */
+    #contraste-toggle-button {
+        font-size: 1em; /* Tamaño de icono normal para desktop */
+        padding: 8px 10px; 
+    }
+    #game-area { padding: 0.5rem; }
+    #scoreboard { width: 20%; min-width: 180px; padding: 0.5rem; }
+    #game-board { width: 80%; padding: 0.5rem; }
+    .player-hand { padding: 0.25rem; margin-bottom: 0.5rem; min-height: 65px; }
+    #player-hand-top { min-height: 65px; }
+    #middle-area { margin-bottom: 0.5rem; min-height: 200px; }
+    #player-hand-left, #player-hand-right {
+        width: 80px; 
+        min-height: 200px;
+        padding: 0.25rem;
+    }
+    #domino-table { min-height: 250px; padding: 10px; }
+    #player-hand-bottom { min-height: 70px; }
+    footer { padding: 0.75rem; font-size: 0.85em; }
+    #game-messages { min-height: 18px; font-size: 0.95em; }
+
+    /* Restaura tamaños de ficha originales para escritorio */
+    .ficha-domino { font-size: 14px; margin: 2px; }
+    .player-hand .ficha-domino {
+        width: 36px;  
+        height: 72px; 
+    }
+    .ficha-en-tablero.doble-en-tablero {
+        width: 36px; min-width: 36px; height: 72px; min-height: 72px;
+    }
+    .ficha-en-tablero.normal-en-tablero {
+        width: 72px; min-width: 72px; height: 36px; min-height: 36px;
+    }
+    #player-hand-left .ficha-dorso, 
+    #player-hand-right .ficha-dorso {
+         width: 72px; 
+         height: 36px;
+         font-size: 1.5em;
+    }
+    .punto-domino { /* Restaura tamaño original de puntos */
+        width: 5px; 
+        height: 5px;
+    }
+    .puntos-layout { padding: 2px; }
+    /* Restaura tamaños de fuente de menú para escritorio */
+    #main-menu h1 { font-size: 2.5em; margin-bottom: 40px;}
+    #sub-menu-practica h2 { font-size: 2em; margin-bottom: 30px; }
+    .menu-options { gap: 15px; max-width: 350px; }
+    .menu-button { padding: 15px 30px; font-size: 1.2em; }
+}
+
+/* Escritorios aún más grandes (opcional, para refinar más si es necesario) 
+   Punto de quiebre: 1200px o mayor */
+@media (min-width: 1200px) {
+    #scoreboard { width: 15%; min-width: 200px; } /* Menos ancho para el marcador, más para el juego */
+    #game-board { width: 85%; }
+}
+
+[end of style.css]
